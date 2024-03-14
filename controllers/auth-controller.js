@@ -181,9 +181,11 @@ const receiveGoogleUserData = async (req, res) => {
     // Find or create the user based on email
     let existingUser = await User.findOne({ email: userData.email });
     if (!existingUser) {
-      // If the user doesn't exist, create a new one
+      // If the user doesn't exist, create a new one with default values or provide suitable defaults
       existingUser = await User.create({
         email: userData.email,
+        password: '', // Provide a default or empty password
+        name: '', // Provide a default or empty name
         createdAt: new Date(),
         token: user.access_token, // Use the access token from Google as the user's token
       });
