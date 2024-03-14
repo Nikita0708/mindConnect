@@ -174,37 +174,31 @@ const receiveGoogleUserData = async (req, res) => {
     );
     const tokenResponse = await oAuth2Client.getToken(code);
     await oAuth2Client.setCredentials(tokenResponse.tokens);
+    const { tokens } = tokenResponse;
     const user = oAuth2Client.credentials;
-    console.log('credentials', user);
-    const userData = await getGoogleUserData(user.access_token); // Get user data
+    const googleUserData = await getGoogleUserData(tokens.access_token);
 
-    // Find or create the user based on email
-    let existingUser = await User.findOne({ email: userData.email });
-    if (!existingUser) {
-      // If the user doesn't exist, create a new one with default values or provide suitable defaults
-      existingUser = await User.create({
-        email: userData.email,
-        password: '', // Provide a default or empty password
-        name: '', // Provide a default or empty name
+    const userMongo = await User.findOne({ email: googleUserData.email });
+
+    if (!userMongo) {
+      // Create a new user if not exists
+      userMongo = await User.create({
+        email: googleUserData.email,
+        name: googleUserData.name,
+        password: '',
+        avatarUrl: googleUserData.avatarUrl,
         createdAt: new Date(),
-        token: user.access_token, // Use the access token from Google as the user's token
       });
-    } else {
-      // If the user exists, update the token
-      existingUser.token = user.access_token;
-      await existingUser.save();
     }
+    await User.findByIdAndUpdate(userMongo._id, { token: tokens.access_token });
 
     res.status(200).json({
-      token: user.access_token,
-      user: {
-        email: existingUser.email,
-        userName: existingUser.name, // Assuming user has a 'name' field
-      },
+      token: tokens.access_token,
+      user: { email: userMongo.email, userName: userMongo.name },
       message: 'You have successfully signed in with Google',
-    }); // Send user data in response
+    });
   } catch (err) {
-    console.log('error with signup', err);
+    console.log('error with Google sign-in', err);
     res.status(500).send(err.message); // Send error message in response
   }
 };
