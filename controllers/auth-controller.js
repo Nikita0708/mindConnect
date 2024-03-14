@@ -145,10 +145,14 @@ const getGoogleUserData = async (access_token) => {
 };
 
 const googleSignIn = async (_, res) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5050');
+  res.header(
+    'Access-Control-Allow-Origin',
+    'https://mindconnect-vebk.onrender.com'
+  );
   res.header('Referrer-Policy', 'no-referrer-when-downgrade');
 
-  const redirectUrl = 'http://localhost:5050/api/auth/googleUserData';
+  const redirectUrl =
+    'https://mindconnect-vebk.onrender.com/api/auth/googleUserData';
   const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, redirectUrl);
 
   const authorizeUrl = oAuth2Client.generateAuthUrl({
@@ -161,7 +165,8 @@ const googleSignIn = async (_, res) => {
 const receiveGoogleUserData = async (req, res) => {
   const code = req.query.code;
   try {
-    const redirectUrl = 'http://localhost:5050/api/auth/googleUserData';
+    const redirectUrl =
+      'https://mindconnect-vebk.onrender.com/api/auth/googleUserData';
     const oAuth2Client = new OAuth2Client(
       CLIENT_ID,
       CLIENT_SECRET,
