@@ -177,7 +177,30 @@ const receiveGoogleUserData = async (req, res) => {
     const user = oAuth2Client.credentials;
     console.log('credentials', user);
     const userData = await getGoogleUserData(user.access_token); // Get user data
-    res.status(200).json(userData); // Send user data in response
+
+    // Find or create the user based on email
+    let existingUser = await User.findOne({ email: userData.email });
+    if (!existingUser) {
+      // If the user doesn't exist, create a new one
+      existingUser = await User.create({
+        email: userData.email,
+        createdAt: new Date(),
+        token: user.access_token, // Use the access token from Google as the user's token
+      });
+    } else {
+      // If the user exists, update the token
+      existingUser.token = user.access_token;
+      await existingUser.save();
+    }
+
+    res.status(200).json({
+      token: user.access_token,
+      user: {
+        email: existingUser.email,
+        userName: existingUser.name, // Assuming user has a 'name' field
+      },
+      message: 'You have successfully signed in with Google',
+    }); // Send user data in response
   } catch (err) {
     console.log('error with signup', err);
     res.status(500).send(err.message); // Send error message in response
