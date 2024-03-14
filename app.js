@@ -1,38 +1,36 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const expressip = require('express-ip');
+import express from 'express';
+import logger from 'morgan';
+import cors from 'cors';
+import 'dotenv/config';
+// import swaggerUiExpress from 'swagger-ui-express';
+// import * as fs from 'fs';
+import authRouter from './routes/api/auth-router.js';
+
+// const swaggerDocument = JSON.parse(fs.readFileSync('./swagger.json', 'utf8'));
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
-app.use(expressip().getIpInfoMiddleware);
+app.use(logger(formatsLogger));
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
 
-app.use((req, res, next) => {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
+app.use('/api/auth', authRouter);
+// app.use(
+//   '/api-docs',
+//   swaggerUiExpress.serve,
+//   swaggerUiExpress.setup(swaggerDocument)
+// );
 
-  // Request methods you wish to allow
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, PATCH, DELETE'
-  );
-
-  // Request headers you wish to allow
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-Requested-With,content-type'
-  );
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-
-  // Pass to next layer of middleware
-  next();
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
 });
 
-require('./routes')(app);
+app.use((err, req, res, next) => {
+  const { status = 500, message = 'Server error' } = err;
+  res.status(status).json({ message });
+});
 
-module.exports = app;
+export default app;
