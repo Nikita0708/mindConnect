@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
       const cookie = req.cookies?.cookie;
       if (cookie && cookie.session) {
         const sessionData = JSON.parse(cookie.session);
-        user_id = sessionData.passport?.user;
+        user_id = extractUserIdFromSession(sessionData);
       }
     }
 
@@ -45,3 +45,12 @@ const authenticate = async (req, res, next) => {
 };
 
 export default ctrlWrapper(authenticate);
+
+// Helper function to extract user ID from session data
+const extractUserIdFromSession = (sessionData) => {
+  try {
+    return sessionData.passport?.user;
+  } catch (error) {
+    return null;
+  }
+};
