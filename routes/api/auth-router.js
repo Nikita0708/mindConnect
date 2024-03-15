@@ -26,6 +26,14 @@ authRouter.get(
     res.status(200).json('you successfully loged in via Google');
   }
 );
+authRouter.get('/googlelogout', (req, res, next) => {
+  req.logout((error) => {
+    if (error) {
+      return next(error);
+    }
+    res.json('you successfully loged out');
+  });
+});
 
 authRouter.post('/signup', userSignupValidate, authController.signup);
 
