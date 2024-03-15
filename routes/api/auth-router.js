@@ -7,16 +7,25 @@ import {
   userSigninSchema,
   userInfoSchema,
 } from '../../utils/validation/authValidationSchema.js';
+import passport from 'passport';
 
 const authRouter = express.Router();
-
-authRouter.get('/oauth', authController.googleSignIn);
-
-authRouter.get('/googleUserData', authController.receiveGoogleUserData);
 
 const userSignupValidate = validateBody(userSignupSchema);
 const userSigninValidate = validateBody(userSigninSchema);
 const userInfoValidate = validateBody(userInfoSchema);
+
+authRouter.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile'] })
+);
+authRouter.get(
+  '/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    res.status(200).json('you successfully loged in via Google');
+  }
+);
 
 authRouter.post('/signup', userSignupValidate, authController.signup);
 

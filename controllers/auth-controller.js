@@ -131,84 +131,10 @@ const logout = async (req, res) => {
 
 // Google Auth
 
-const getGoogleUserData = async (access_token) => {
-  const response = await fetch(
-    `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`
-  );
-  const data = await response.json();
-  return {
-    token: access_token,
-    name: data.given_name,
-    Lastname: data.family_name,
-    avatarUrl: data.picture,
-  };
-};
-
-const googleSignIn = async (_, res) => {
-  res.header(
-    'Access-Control-Allow-Origin',
-    'https://mindconnect-vebk.onrender.com'
-  );
-  res.header('Referrer-Policy', 'no-referrer-when-downgrade');
-
-  const redirectUrl =
-    'https://mindconnect-vebk.onrender.com/api/auth/googleUserData';
-  const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, redirectUrl);
-
-  const authorizeUrl = oAuth2Client.generateAuthUrl({
-    scope: 'https://www.googleapis.com/auth/userinfo.profile openid',
-    prompt: 'consent',
-  });
-  res.json({ url: authorizeUrl });
-};
-
-const receiveGoogleUserData = async (req, res) => {
-  const code = req.query.code;
-  try {
-    const redirectUrl =
-      'https://mindconnect-vebk.onrender.com/api/auth/googleUserData';
-    const oAuth2Client = new OAuth2Client(
-      CLIENT_ID,
-      CLIENT_SECRET,
-      redirectUrl
-    );
-    const tokenResponse = await oAuth2Client.getToken(code);
-    await oAuth2Client.setCredentials(tokenResponse.tokens);
-    const { tokens } = tokenResponse;
-    const user = oAuth2Client.credentials;
-    const googleUserData = await getGoogleUserData(tokens.access_token);
-
-    const userMongo = await User.findOne({ email: googleUserData.email });
-
-    if (!userMongo) {
-      // Create a new user if not exists
-      userMongo = await User.create({
-        email: googleUserData.email,
-        name: googleUserData.name,
-        password: '',
-        avatarUrl: googleUserData.avatarUrl,
-        createdAt: new Date(),
-      });
-    }
-    await User.findByIdAndUpdate(userMongo._id, { token: tokens.access_token });
-
-    res.status(200).json({
-      token: tokens.access_token,
-      user: { email: userMongo.email, userName: userMongo.name },
-      message: 'You have successfully signed in with Google',
-    });
-  } catch (err) {
-    console.log('error with Google sign-in', err);
-    res.status(500).send(err.message); // Send error message in response
-  }
-};
-
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   updateUserInfo: ctrlWrapper(updateUserInfo),
   logout: ctrlWrapper(logout),
-  googleSignIn: googleSignIn,
-  receiveGoogleUserData: receiveGoogleUserData,
 };
