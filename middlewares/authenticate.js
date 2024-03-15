@@ -6,49 +6,37 @@ import User from '../models/User.js';
 const { API_KEY_JWT } = process.env;
 
 const authenticate = async (req, res, next) => {
-  const { authorization = '' } = req.headers;
-  const [bearer, token] = authorization.split(' ');
-  if (bearer !== 'Bearer') {
-    throw HttpError(401, 'Not authorized');
-  }
-
   try {
     let user_id;
-    if (token) {
-      const decoded_token = jwt.decode(token, API_KEY_JWT, {
+
+    // Check for JWT token
+    const { authorization = '' } = req.headers;
+    const [bearer, token] = authorization.split(' ');
+    if (bearer === 'Bearer' && token) {
+      const decoded_token = jwt.verify(token, API_KEY_JWT, {
         algorithms: ['HS256'],
       });
-      user_id = decoded_token?.id;
+      user_id = decoded_token.id;
     } else {
-      // Handle cookie-based authentication
-      const googleCookie = req.cookies?._ga;
-      if (googleCookie) {
-        // Implement logic to extract and verify user ID from Google cookie
-        user_id = extractUserIdFromGoogleCookie(googleCookie);
+      // If no token, attempt to retrieve user ID from session cookie
+      const cookie = req.cookies?.cookie;
+      if (cookie && cookie.passport && cookie.passport.user) {
+        user_id = cookie.passport.user;
+      } else {
+        throw new HttpError(401, 'Not authorized');
       }
     }
 
-    if (!user_id) {
-      throw HttpError(401, 'Not authorized');
+    // Check if user exists in the database
+    const user = await User.findById(user_id);
+    if (!user || !user.token) {
+      throw new HttpError(401, 'Not authorized');
     }
 
-    // Assuming you have access to MongoDB sessions data
-    // and can extract the session object
-    const session = await getSessionByUserId(user_id);
-    if (!session) {
-      throw HttpError(401, 'Not authorized');
-    }
-
-    // Check if user is logged in or logged out based on session data
-    if ('passport' in session) {
-      req.user = session['passport']['user'];
-    } else {
-      throw HttpError(401, 'Not authorized');
-    }
-
+    req.user = user;
     next();
   } catch (error) {
-    next(HttpError(401, 'Not authorized'));
+    next(new HttpError(401, 'Not authorized'));
   }
 };
 
