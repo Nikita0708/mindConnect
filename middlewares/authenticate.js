@@ -21,20 +21,31 @@ const authenticate = async (req, res, next) => {
       user_id = decoded_token?.id;
     } else {
       // Handle cookie-based authentication
-      const cookie = req.cookies?.cookie;
-      if (cookie) {
-        user_id = cookie?.passport?.user;
-      } else {
-        throw HttpError(401, 'Not authorized');
+      const googleCookie = req.cookies?._ga;
+      if (googleCookie) {
+        // Implement logic to extract and verify user ID from Google cookie
+        user_id = extractUserIdFromGoogleCookie(googleCookie);
       }
     }
 
-    const user = await User.findById(user_id);
-    if (!user || !user.token) {
+    if (!user_id) {
       throw HttpError(401, 'Not authorized');
     }
 
-    req.user = user;
+    // Assuming you have access to MongoDB sessions data
+    // and can extract the session object
+    const session = await getSessionByUserId(user_id);
+    if (!session) {
+      throw HttpError(401, 'Not authorized');
+    }
+
+    // Check if user is logged in or logged out based on session data
+    if ('passport' in session) {
+      req.user = session['passport']['user'];
+    } else {
+      throw HttpError(401, 'Not authorized');
+    }
+
     next();
   } catch (error) {
     next(HttpError(401, 'Not authorized'));
