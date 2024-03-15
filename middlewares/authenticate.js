@@ -20,23 +20,24 @@ const authenticate = async (req, res, next) => {
     } else {
       // If no token, attempt to retrieve user ID from session cookie
       const cookie = req.cookies?.cookie;
-      if (cookie && cookie.passport && cookie.passport.user) {
-        user_id = cookie.passport.user;
+      if (cookie && cookie.session) {
+        const sessionData = JSON.parse(cookie.session);
+        user_id = sessionData.passport.user;
       } else {
-        throw HttpError(401, 'Not authorized');
+        throw new HttpError(401, 'Not authorized');
       }
     }
 
     // Check if user exists in the database
     const user = await User.findById(user_id);
     if (!user || !user.token) {
-      throw HttpError(401, 'Not authorized');
+      throw new HttpError(401, 'Not authorized');
     }
 
     req.user = user;
     next();
   } catch (error) {
-    next(HttpError(401, 'Not authorized'));
+    next(new HttpError(401, 'Not authorized'));
   }
 };
 
