@@ -7,42 +7,44 @@ import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 const emailRegexp = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
 
-const UserSchema = new Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Enter you name'],
-      max: 20,
-    },
-    lastName: {
-      type: String,
-      max: 20,
-    },
-    email: {
-      type: String,
-      match: emailRegexp,
-      unique: true,
-      required: [true, 'Email is required'],
-    },
-    password: {
-      type: String,
-      minlength: 6,
-      required: true,
-    },
-    number: {
-      type: String,
-      match: numberRegexp,
-    },
-    age: {
-      type: Number,
-      min: 10,
-      max: 120,
-    },
-    token: String,
-    avatarUrl: String,
+const UserSchema = new Schema({
+  googleId: {
+    type: String,
   },
-  { versionKey: false, timestamps: true }
-);
+  firstName: {
+    type: String,
+    required: [true, 'Enter you name'],
+    max: 20,
+  },
+  lastName: {
+    type: String,
+    max: 20,
+  },
+  email: {
+    type: String,
+    match: emailRegexp,
+    unique: true,
+  },
+  password: {
+    type: String,
+    minlength: 6,
+  },
+  number: {
+    type: String,
+    match: numberRegexp,
+  },
+  age: {
+    type: Number,
+    min: 10,
+    max: 120,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  token: String,
+  image: String,
+});
 
 UserSchema.post('save', handleSaveError);
 

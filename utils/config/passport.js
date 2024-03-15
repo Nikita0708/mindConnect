@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-google-oauth20';
 // import mongoose from 'mongoose';
-import User from '../../models/GoogleUser.js';
+import User from '../../models/User.js';
 
 const passportConfig = (passport) => {
   passport.use(
@@ -13,7 +13,6 @@ const passportConfig = (passport) => {
       async (accessToken, refreshToken, profile, done) => {
         const newUser = {
           googleId: profile.id,
-          displayName: profile.displayName,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
           image: profile.photos[0].value,

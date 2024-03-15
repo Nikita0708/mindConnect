@@ -4,9 +4,6 @@ import User from '../models/User.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
-const { CLIENT_ID } = process.env;
-const { CLIENT_SECRET } = process.env;
-import { OAuth2Client } from 'google-auth-library';
 
 const { API_KEY_JWT } = process.env;
 
@@ -74,10 +71,10 @@ const getCurrent = async (req, res) => {
   const { email, name, lastName, number, avatarUrl } = req.user;
   res.json({
     email,
-    name,
+    firstName,
     lastName,
     number,
-    avatarUrl,
+    image,
   });
 };
 
@@ -110,10 +107,10 @@ const updateUserInfo = async (req, res) => {
   const finalAvatarUrl = avatarUrl || uploadedAvatarUrl || req.user.avatarURL;
 
   const updatedUserData = {
-    name,
+    firstName,
     lastName,
     number,
-    avatarUrl: finalAvatarUrl,
+    image: finalAvatarUrl,
   };
   await User.findByIdAndUpdate(_id, updatedUserData);
 
