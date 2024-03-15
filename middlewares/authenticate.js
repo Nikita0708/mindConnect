@@ -22,10 +22,13 @@ const authenticate = async (req, res, next) => {
       const cookie = req.cookies?.cookie;
       if (cookie && cookie.session) {
         const sessionData = JSON.parse(cookie.session);
-        user_id = sessionData.passport.user;
-      } else {
-        throw HttpError(401, 'Not authorized');
+        user_id = sessionData.passport?.user;
       }
+    }
+
+    // If user ID is not found from token or session cookie, throw error
+    if (!user_id) {
+      throw HttpError(401, 'Not authorized');
     }
 
     // Check if user exists in the database
