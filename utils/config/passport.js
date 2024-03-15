@@ -8,7 +8,7 @@ const passportConfig = (passport) => {
       {
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: '/callback',
+        callbackURL: 'https://mindconnect-vebk.onrender.com/api/auth/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         const newUser = {
