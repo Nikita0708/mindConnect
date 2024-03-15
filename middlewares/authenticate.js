@@ -23,20 +23,20 @@ const authenticate = async (req, res, next) => {
       if (cookie && cookie.passport && cookie.passport.user) {
         user_id = cookie.passport.user;
       } else {
-        throw new HttpError(401, 'Not authorized');
+        throw HttpError(401, 'Not authorized');
       }
     }
 
     // Check if user exists in the database
     const user = await User.findById(user_id);
     if (!user || !user.token) {
-      throw new HttpError(401, 'Not authorized');
+      throw HttpError(401, 'Not authorized');
     }
 
     req.user = user;
     next();
   } catch (error) {
-    next(new HttpError(401, 'Not authorized'));
+    next(HttpError(401, 'Not authorized'));
   }
 };
 
