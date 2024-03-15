@@ -4,7 +4,7 @@ const emailRegexp = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
 
 export const userSignupSchema = Joi.object({
-  name: Joi.string().max(20).required().messages({
+  firstName: Joi.string().max(20).required().messages({
     'string.base': `"name" should be a type of 'text'`,
     'string.empty': `"name" cannot be an empty field`,
     'string.max': `"name" should have a maximum length of 20`,
@@ -45,7 +45,7 @@ export const userSigninSchema = Joi.object({
 });
 
 export const userInfoSchema = Joi.object({
-  name: Joi.string().max(20).messages({
+  firstName: Joi.string().max(20).messages({
     'string.base': `"name" should be a type of 'text'`,
     'string.empty': `"name" cannot be an empty field`,
     'string.max': `"name" should have a maximum length of 20`,
@@ -60,5 +60,5 @@ export const userInfoSchema = Joi.object({
     'string.empty': `"number" must not be empty.`,
     'string.pattern.base': `"number" must be in format +38(095)1231234.`,
   }),
-  avatarURL: Joi.binary(),
+  image: Joi.binary(),
 });

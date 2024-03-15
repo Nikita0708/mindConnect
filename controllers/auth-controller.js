@@ -14,7 +14,7 @@ cloudinary.config({
 });
 
 const signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { firstName, email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, `email ${email} already in use`);
@@ -37,7 +37,7 @@ const signup = async (req, res) => {
 
   res.status(201).json({
     token: userInfo.token,
-    user: { email: userInfo.email, userName: name },
+    user: { email: userInfo.email, userName: firstName },
     message: 'You have successfully signed up',
   });
 };
@@ -68,7 +68,7 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-  const { email, name, lastName, number, avatarUrl } = req.user;
+  const { email, firstName, lastName, number, avatarUrl } = req.user;
   res.json({
     email,
     firstName,
@@ -79,7 +79,7 @@ const getCurrent = async (req, res) => {
 };
 
 const updateUserInfo = async (req, res) => {
-  const { name, lastName, number, avatarUrl } = req.body;
+  const { firstName, lastName, number, image } = req.body;
 
   const { _id } = req.user;
 
@@ -104,7 +104,7 @@ const updateUserInfo = async (req, res) => {
     }
   }
 
-  const finalAvatarUrl = avatarUrl || uploadedAvatarUrl || req.user.avatarURL;
+  const finalAvatarUrl = image || uploadedAvatarUrl || req.user.image;
 
   const updatedUserData = {
     firstName,
