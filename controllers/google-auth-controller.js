@@ -1,6 +1,6 @@
-import { HttpError } from '../helpers/index.js';
-import { ctrlWrapper } from '../decorators/index.js';
-import bcrypt from 'bcryptjs';
+// import { HttpError } from '../helpers/index.js';
+// import { ctrlWrapper } from '../decorators/index.js';
+// import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { OAuth2Client } from 'google-auth-library';
@@ -19,7 +19,7 @@ const googleSignIn = async (req, res, next) => {
     redirectUrl
   );
   const authorizeUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
+    access_type: 'online',
     scope: 'https://www.googleapis.com/auth/userinfo.profile openid',
     prompt: 'consent',
   });
