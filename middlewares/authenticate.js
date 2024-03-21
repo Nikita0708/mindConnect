@@ -1,42 +1,25 @@
 import jwt from 'jsonwebtoken';
 import { HttpError } from '../helpers/index.js';
+
 import { ctrlWrapper } from '../decorators/index.js';
+
 import User from '../models/User.js';
 
 const { API_KEY_JWT } = process.env;
 
 const authenticate = async (req, res, next) => {
+  const { authorization = '' } = req.headers;
+  const [bearer, token] = authorization.split(' ');
+  if (bearer !== 'Bearer') {
+    throw HttpError(401, 'Not authorized');
+  }
+
   try {
-    let user_id;
-
-    // Check for JWT token
-    const { authorization = '' } = req.headers;
-    const [bearer, token] = authorization.split(' ');
-    if (bearer === 'Bearer' && token) {
-      const decoded_token = jwt.verify(token, API_KEY_JWT, {
-        algorithms: ['HS256'],
-      });
-      user_id = decoded_token.id;
-    } else {
-      // If no token, attempt to retrieve user ID from session cookie
-      const cookie = req.cookies?.cookie;
-      if (cookie && cookie.session) {
-        const sessionData = JSON.parse(cookie.session);
-        user_id = extractUserIdFromSession(sessionData);
-      }
-    }
-
-    // If user ID is not found from token or session cookie, throw error
-    if (!user_id) {
-      throw HttpError(401, 'Not authorized');
-    }
-
-    // Check if user exists in the database
-    const user = await User.findById(user_id);
+    const { id } = jwt.verify(token, API_KEY_JWT);
+    const user = await User.findById(id);
     if (!user || !user.token) {
       throw HttpError(401, 'Not authorized');
     }
-
     req.user = user;
     next();
   } catch (error) {
@@ -45,12 +28,3 @@ const authenticate = async (req, res, next) => {
 };
 
 export default ctrlWrapper(authenticate);
-
-// Helper function to extract user ID from session data
-const extractUserIdFromSession = (sessionData) => {
-  try {
-    return sessionData.passport?.user;
-  } catch (error) {
-    return null;
-  }
-};

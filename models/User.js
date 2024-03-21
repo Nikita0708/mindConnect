@@ -8,12 +8,8 @@ const emailRegexp = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
 
 const UserSchema = new Schema({
-  googleId: {
-    type: String,
-  },
   firstName: {
     type: String,
-    required: [true, 'Enter you name'],
     max: 20,
   },
   lastName: {
@@ -22,8 +18,7 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    match: emailRegexp,
-    unique: true,
+    // match: emailRegexp,
   },
   password: {
     type: String,
@@ -33,6 +28,7 @@ const UserSchema = new Schema({
     type: String,
     match: numberRegexp,
   },
+  sub: Number,
   age: {
     type: Number,
     min: 10,
