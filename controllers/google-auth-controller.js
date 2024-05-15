@@ -50,20 +50,22 @@ const receiveGoogleUserData = async (req, res, next) => {
   console.log('Tokens Acquired');
   const user = oAuth2Client.credentials;
   const userData = await getGoogleUserData(user.access_token);
-  //   const userWithData = { ...user, ...userData };
 
   const isExistUser = await User.findOne({ sub: userData.sub });
   if (isExistUser) {
     const payload = {
       id: isExistUser._id,
     };
-    const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '23h' });
+    const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
+    const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
 
     const userInfo = await User.findByIdAndUpdate(isExistUser._id, {
       token,
+      refreshToken,
     });
     res.json({
       token: userInfo.token,
+      refreshToken: userInfo.refreshToken,
       user: { firstName: userInfo.firstName },
       message: 'You have successfully signed in',
     });
@@ -78,12 +80,15 @@ const receiveGoogleUserData = async (req, res, next) => {
     const payload = {
       id: newUser._id,
     };
-    const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '23h' });
+    const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
+    const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
     const userInfo = await User.findByIdAndUpdate(newUser._id, {
-      token: token,
+      token,
+      refreshToken,
     });
     res.json({
       token: userInfo.token,
+      refreshToken: userInfo.refreshToken,
       user: { firstName: userInfo.firstName },
       message: 'You have successfully signed up',
     });

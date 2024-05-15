@@ -32,11 +32,16 @@ const signup = async (req, res) => {
     id: newUser._id,
   };
 
-  const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '23h' });
-  const userInfo = await User.findByIdAndUpdate(newUser._id, { token });
+  const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
+  const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
+  const userInfo = await User.findByIdAndUpdate(newUser._id, {
+    token,
+    refreshToken,
+  });
 
   res.status(201).json({
     token: userInfo.token,
+    refreshToken: userInfo.refreshToken,
     user: { email: userInfo.email, userName: firstName },
     message: 'You have successfully signed up',
   });
@@ -57,11 +62,17 @@ const signin = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '23h' });
-  const userInfo = await User.findByIdAndUpdate(user._id, { token });
+  const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
+  const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
+
+  const userInfo = await User.findByIdAndUpdate(user._id, {
+    token,
+    refreshToken,
+  });
 
   res.json({
     token: userInfo.token,
+    refreshToken: userInfo.refreshToken,
     user: { email: userInfo.email },
     message: 'You have successfully signed in',
   });
@@ -126,7 +137,36 @@ const logout = async (req, res) => {
   });
 };
 
-// Google Auth
+const refreshToken = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const { _id } = req.user;
+
+  const existingUser = await User.findById(_id);
+
+  if (refreshToken === existingUser.refreshToken) {
+    const payload = {
+      id: existingUser._id,
+    };
+    const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
+    const newRefreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
+
+    const userInfo = await User.findByIdAndUpdate(existingUser._id, {
+      token,
+      refreshToken: newRefreshToken,
+    });
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.json({
+      token: userInfo.token,
+      refreshToken: userInfo.refreshToken,
+    });
+  } else {
+    throw HttpError(401, 'refresh token is not valid');
+  }
+};
 
 export default {
   signup: ctrlWrapper(signup),
@@ -134,4 +174,5 @@ export default {
   getCurrent: ctrlWrapper(getCurrent),
   updateUserInfo: ctrlWrapper(updateUserInfo),
   logout: ctrlWrapper(logout),
+  refreshtoken: ctrlWrapper(refreshToken),
 };
