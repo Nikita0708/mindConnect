@@ -26,8 +26,6 @@ authRouter.post('/signup', userSignupValidate, authController.signup);
 
 authRouter.post('/signin', userSigninValidate, authController.signin);
 
-authRouter.post('/resetpassword', userSigninValidate, authController.signin);
-
 authRouter.post('/refreshtoken', authController.refreshtoken);
 
 authRouter.patch(
@@ -37,6 +35,9 @@ authRouter.patch(
   userInfoValidate,
   authController.updateUserInfo
 );
+
+authRouter.post('/requestpasswordreset', authController.requestPasswordReset);
+authRouter.post('/resetpassword/:token', authController.resetPassword);
 
 authRouter.get('/current', authenticate, authController.getCurrent);
 

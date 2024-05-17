@@ -40,6 +40,7 @@ const UserSchema = new Schema({
   },
   token: String,
   refreshToken: String,
+  resetPasswordtoken: String,
   image: String,
 });
 

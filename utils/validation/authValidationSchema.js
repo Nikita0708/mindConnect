@@ -5,10 +5,10 @@ const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
 
 export const userSignupSchema = Joi.object({
   firstName: Joi.string().max(20).required().messages({
-    'string.base': `"name" should be a type of 'text'`,
-    'string.empty': `"name" cannot be an empty field`,
-    'string.max': `"name" should have a maximum length of 20`,
-    'any.required': `"name" is a required field.`,
+    'string.base': `"firstName" should be a type of 'text'`,
+    'string.empty': `"firstName" cannot be an empty field`,
+    'string.max': `"firstName" should have a maximum length of 20`,
+    'any.required': `"firstName" is a required field.`,
   }),
   email: Joi.string().pattern(emailRegexp).required().messages({
     'string.base': `"email" must be a string.`,

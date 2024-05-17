@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
+import nodemailer from 'nodemailer';
 
 const { API_KEY_JWT } = process.env;
 
@@ -168,6 +169,74 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+  const existingUser = await User.findOne({ email });
+
+  if (!existingUser) {
+    throw HttpError(400, 'User with this email does not exist');
+  }
+
+  const payload = {
+    id: existingUser._id,
+  };
+  const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '15m' });
+
+  await User.findByIdAndUpdate(existingUser._id, {
+    resetPasswordtoken: token,
+  });
+
+  const transporter = nodemailer.createTransport({
+    service: 'Hotmail',
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    to: existingUser.email,
+    from: process.env.EMAIL,
+    subject: 'Password Reset',
+    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+           Please click on the following link, or paste this into your browser to complete the process:\n\n
+           http://${req.headers.host}/reset-password/${token}\n\n
+           If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+  };
+
+  transporter.sendMail(mailOptions, (err) => {
+    if (err) {
+      return res.status(500).json('Error sending email.');
+    }
+    res.status(200).json('Password reset link sent.');
+  });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.API_KEY_JWT);
+    const user = await User.findOne({
+      _id: decoded.id,
+      resetPasswordtoken: token,
+    });
+
+    if (!user) {
+      throw HttpError(400, 'Password reset token is invalid or expired.');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+      resetPasswordtoken: '',
+    });
+    res.status(200).json('Password has been reset.');
+  } catch (err) {
+    res.status(500).json('Error resetting password.');
+  }
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
@@ -175,4 +244,6 @@ export default {
   updateUserInfo: ctrlWrapper(updateUserInfo),
   logout: ctrlWrapper(logout),
   refreshtoken: ctrlWrapper(refreshToken),
+  requestPasswordReset: ctrlWrapper(requestPasswordReset),
+  resetPassword: ctrlWrapper(resetPassword),
 };
