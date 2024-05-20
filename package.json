@@ -48,6 +48,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
+    "socket.io": "^4.7.5",
+    "socketio": "^1.0.0",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
