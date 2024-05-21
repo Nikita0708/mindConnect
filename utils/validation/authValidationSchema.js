@@ -10,7 +10,7 @@ export const userSignupSchema = Joi.object({
     'string.max': `"firstName" should have a maximum length of 20`,
     'any.required': `"firstName" is a required field.`,
   }),
-  email: Joi.string().pattern(emailRegexp).required().messages({
+  email: Joi.string().required().messages({
     'string.base': `"email" must be a string.`,
     'string.empty': `"email" must not be empty.`,
     'string.pattern.base': `"email" must be in format example@gmail.com.`,
