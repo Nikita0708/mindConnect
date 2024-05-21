@@ -8,6 +8,7 @@ import { OAuth2Client } from 'google-auth-library';
 const { API_KEY_JWT } = process.env;
 
 const googleSignIn = async (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.header('Referrer-Policy', 'no-referrer-when-downgrade');
   const redirectUrl =
     'https://mindconnect-vebk.onrender.com/api/auth/getgoogleuserdata';
@@ -44,9 +45,11 @@ const receiveGoogleUserData = async (req, res, next) => {
     process.env.CLIENT_SECRET,
     redirectUrl
   );
+
   const response = await oAuth2Client.getToken(code);
-  await oAuth2Client.setCredentials(response.tokens);
+  oAuth2Client.setCredentials(response.tokens);
   console.log('Tokens Acquired');
+
   const user = oAuth2Client.credentials;
   const userData = await getGoogleUserData(user.access_token);
 
@@ -62,6 +65,7 @@ const receiveGoogleUserData = async (req, res, next) => {
       token,
       refreshToken,
     });
+
     res.json({
       token: userInfo.token,
       refreshToken: userInfo.refreshToken,
@@ -76,15 +80,18 @@ const receiveGoogleUserData = async (req, res, next) => {
       image: userData.picture,
       email: userData.sub,
     });
+
     const payload = {
       id: newUser._id,
     };
     const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
     const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
+
     const userInfo = await User.findByIdAndUpdate(newUser._id, {
       token,
       refreshToken,
     });
+
     res.json({
       token: userInfo.token,
       refreshToken: userInfo.refreshToken,
