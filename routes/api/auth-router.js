@@ -36,8 +36,10 @@ authRouter.patch(
   authController.updateUserInfo
 );
 
-authRouter.post('/requestpasswordreset', authController.requestPasswordReset);
-authRouter.post('/resetpassword/:token', authController.resetPassword);
+authRouter.get('/verify-token/:token', authController.verifyToken);
+
+authRouter.post('/request-password-reset', authController.requestPasswordReset);
+authRouter.post('/reset-password/:token', authController.resetPassword);
 
 authRouter.get('/current', authenticate, authController.getCurrent);
 

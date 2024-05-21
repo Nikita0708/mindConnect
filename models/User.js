@@ -38,7 +38,16 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  doctor: Number,
+  isDoctor: {
+    type: Boolean,
+    default: false,
+  },
+  certificate: {
+    type: Boolean,
+    match: true,
+  },
+  description: String,
+  userDoctor: Number,
   token: String,
   refreshToken: String,
   resetPasswordtoken: String,

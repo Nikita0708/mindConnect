@@ -27,6 +27,16 @@ export const userSignupSchema = Joi.object({
     'string.empty': `"number" must not be empty.`,
     'string.pattern.base': `"number" must be in format +38(095)1231234.`,
   }),
+  isDoctor: Joi.boolean().messages({
+    'string.base': `"isDoctor" must be a boolean.`,
+    'string.empty': `"isDoctor" must not be empty.`,
+    'string.pattern.base': `"isDoctor" must be in format true/false`,
+  }),
+  certificate: Joi.boolean().messages({
+    'string.base': `"certificate" must be a boolean.`,
+    'string.empty': `"certificate" must not be empty.`,
+    'string.pattern.base': `"certificate" must be in format true/false`,
+  }),
 });
 
 export const userSigninSchema = Joi.object({
@@ -61,4 +71,8 @@ export const userInfoSchema = Joi.object({
     'string.pattern.base': `"number" must be in format +38(095)1231234.`,
   }),
   image: Joi.binary(),
+  description: Joi.string().messages({
+    'string.base': `"description" should be a type of 'text'`,
+    'string.empty': `"description" cannot be an empty field`,
+  }),
 });

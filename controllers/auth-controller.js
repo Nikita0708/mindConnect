@@ -15,10 +15,14 @@ cloudinary.config({
 });
 
 const signup = async (req, res) => {
-  const { firstName, email, password } = req.body;
+  const { firstName, email, password, isDoctor, certificate } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, `email ${email} already in use`);
+  }
+
+  if (isDoctor && !certificate) {
+    throw HttpError(403, 'if you are doctor, you must have a certificate');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -80,20 +84,30 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = async (req, res) => {
-  const { email, firstName, lastName, number, image } = req.user;
+  const {
+    email,
+    firstName,
+    lastName,
+    number,
+    image,
+    certificate,
+    description,
+  } = req.user;
   res.json({
     email,
     firstName,
     lastName,
     number,
     image,
+    certificate,
+    description,
   });
 };
 
 const updateUserInfo = async (req, res) => {
-  const { firstName, lastName, number, image } = req.body;
+  const { firstName, lastName, number, image, description } = req.body;
 
-  const { _id } = req.user;
+  const { _id, isDoctor } = req.user;
 
   let uploadedAvatarUrl = null;
 
@@ -118,12 +132,18 @@ const updateUserInfo = async (req, res) => {
 
   const finalAvatarUrl = image || uploadedAvatarUrl || req.user.image;
 
+  if (!isDoctor && description) {
+    throw HttpError(403, 'you are not a doctor to change your description');
+  }
+
   const updatedUserData = {
     firstName,
     lastName,
     number,
+    description,
     image: finalAvatarUrl,
   };
+
   await User.findByIdAndUpdate(_id, updatedUserData);
 
   res.status(200).json(updatedUserData);
@@ -225,6 +245,21 @@ const requestPasswordReset = async (req, res) => {
   });
 };
 
+const verifyToken = async (req, res) => {
+  const token = req.params.token;
+  const decoded = jwt.verify(token, process.env.API_KEY_JWT);
+
+  const user = await User.findOne({
+    _id: decoded.id,
+    resetPasswordtoken: token,
+  });
+
+  if (!user) {
+    throw HttpError(400, 'Password reset token is invalid or expired.');
+  }
+  res.status(200).json('token valid');
+};
+
 const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -259,4 +294,5 @@ export default {
   refreshtoken: ctrlWrapper(refreshToken),
   requestPasswordReset: ctrlWrapper(requestPasswordReset),
   resetPassword: ctrlWrapper(resetPassword),
+  verifyToken: ctrlWrapper(verifyToken),
 };
