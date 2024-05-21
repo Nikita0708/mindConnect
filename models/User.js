@@ -18,7 +18,6 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    match: emailRegexp,
   },
   password: {
     type: String,
@@ -38,6 +37,7 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  doctor: Number,
   token: String,
   refreshToken: String,
   resetPasswordtoken: String,
