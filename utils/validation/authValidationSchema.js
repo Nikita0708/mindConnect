@@ -30,7 +30,7 @@ export const userSignupSchema = Joi.object({
 });
 
 export const userSigninSchema = Joi.object({
-  email: Joi.string().pattern(emailRegexp).required().messages({
+  email: Joi.string().required().messages({
     'string.base': `"email" must be a string.`,
     'string.empty': `"email" must not be empty.`,
     'string.pattern.base': `"email" must be in format example@gmail.com.`,
