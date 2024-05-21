@@ -4,7 +4,11 @@ import app from './app.js';
 const { dbUrlMongoDB, PORT } = process.env;
 
 mongoose
-  .connect(dbUrlMongoDB)
+  .connect(dbUrlMongoDB, {
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log('Database connection successful');
     app.listen(PORT, '0.0.0.0', () => {

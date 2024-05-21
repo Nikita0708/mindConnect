@@ -8,7 +8,6 @@ import { OAuth2Client } from 'google-auth-library';
 const { API_KEY_JWT } = process.env;
 
 const googleSignIn = async (req, res, next) => {
-  // res.header('Access-Control-Allow-Origin', 'frontendlink');
   res.header('Referrer-Policy', 'no-referrer-when-downgrade');
   const redirectUrl =
     'https://mindconnect-vebk.onrender.com/api/auth/getgoogleuserdata';

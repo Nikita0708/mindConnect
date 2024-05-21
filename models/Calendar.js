@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 
 const { Schema, model } = mongoose;
 
@@ -15,7 +16,16 @@ const CalendarSchema = new Schema({
   },
   date: {
     type: Date,
-    required: true,
   },
   notes: [itemSchema],
 });
+
+CalendarSchema.post('save', handleSaveError);
+
+CalendarSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
+
+CalendarSchema.post('findOneAndUpdate', handleSaveError);
+
+const Calendar = model('calendar', CalendarSchema);
+
+export default Calendar;

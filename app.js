@@ -6,10 +6,10 @@ import passport from 'passport';
 import authRouter from './routes/api/auth-router.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import calendarRouter from './routes/api/calendar-router.js';
 
 import passportConfig from './utils/config/passport.js';
 passportConfig(passport);
-
 const app = express();
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
@@ -31,6 +31,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 app.use('/api/auth', authRouter);
+app.use('/api/calendar', calendarRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });

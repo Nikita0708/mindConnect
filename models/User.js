@@ -4,7 +4,6 @@ const { Schema, model } = mongoose;
 
 import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 
-const emailRegexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
 
 const UserSchema = new Schema({
@@ -18,7 +17,6 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    match: emailRegexp,
   },
   password: {
     type: String,
