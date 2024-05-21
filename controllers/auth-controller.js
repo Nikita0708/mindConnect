@@ -177,6 +177,18 @@ const requestPasswordReset = async (req, res) => {
     throw HttpError(400, 'User with this email does not exist');
   }
 
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  const now = Date.now();
+
+  if (
+    existingUser.resetPasswordRequestedAt &&
+    now - existingUser.resetPasswordRequestedAt < FIVE_MINUTES
+  ) {
+    throw HttpError(
+      400,
+      'password reset was already requested, wait for 15 minutes'
+    );
+  }
   const payload = {
     id: existingUser._id,
   };
@@ -184,6 +196,7 @@ const requestPasswordReset = async (req, res) => {
 
   await User.findByIdAndUpdate(existingUser._id, {
     resetPasswordtoken: token,
+    resetPasswordRequestedAt: now,
   });
 
   const transporter = nodemailer.createTransport({
@@ -197,7 +210,7 @@ const requestPasswordReset = async (req, res) => {
   const mailOptions = {
     to: existingUser.email,
     from: process.env.EMAIL,
-    subject: 'Password Reset',
+    subject: 'Password Reset Mind Connect',
     text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
            Please click on the following link, or paste this into your browser to complete the process:\n\n
            https://${req.headers.host}/auth/reset-password/${token}\n\n

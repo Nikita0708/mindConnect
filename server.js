@@ -1,13 +1,13 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import app from './app.js';
 
-const {dbUrlMongoDB, PORT} = process.env;
+const { dbUrlMongoDB, PORT } = process.env;
 
 mongoose
   .connect(dbUrlMongoDB)
   .then(() => {
-    console.log("Database connection successful");
-    app.listen(PORT, () => {
+    console.log('Database connection successful');
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running. Use your API on port: ${PORT}`);
     });
   })

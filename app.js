@@ -5,9 +5,7 @@ import 'dotenv/config';
 import passport from 'passport';
 import authRouter from './routes/api/auth-router.js';
 import session from 'express-session';
-import mongoose from 'mongoose';
 import MongoStore from 'connect-mongo';
-import { Socket } from 'socket.io';
 
 import passportConfig from './utils/config/passport.js';
 passportConfig(passport);
@@ -15,26 +13,6 @@ passportConfig(passport);
 const app = express();
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
-
-const io = Socket(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log('New client connected');
-
-  socket.on('join-room', (roomId, userId) => {
-    socket.join(roomId);
-    socket.broadcast.to(roomId).emit('user-connected', userId);
-
-    socket.on('disconnect', () => {
-      socket.broadcast.to(roomId).emit('user-disconnected', userId);
-    });
-  });
-});
 
 app.use(
   session({
