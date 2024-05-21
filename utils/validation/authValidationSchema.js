@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const emailRegexp = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+const emailRegexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const numberRegexp = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
 
 export const userSignupSchema = Joi.object({
@@ -10,7 +10,7 @@ export const userSignupSchema = Joi.object({
     'string.max': `"firstName" should have a maximum length of 20`,
     'any.required': `"firstName" is a required field.`,
   }),
-  email: Joi.string().required().messages({
+  email: Joi.string().pattern(emailRegexp).required().messages({
     'string.base': `"email" must be a string.`,
     'string.empty': `"email" must not be empty.`,
     'string.pattern.base': `"email" must be in format example@gmail.com.`,
@@ -30,7 +30,7 @@ export const userSignupSchema = Joi.object({
 });
 
 export const userSigninSchema = Joi.object({
-  email: Joi.string().required().messages({
+  email: Joi.string().pattern(emailRegexp).required().messages({
     'string.base': `"email" must be a string.`,
     'string.empty': `"email" must not be empty.`,
     'string.pattern.base': `"email" must be in format example@gmail.com.`,
