@@ -39,6 +39,10 @@ const signup = async (req, res) => {
 
   const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
   const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
   const userInfo = await User.findByIdAndUpdate(newUser._id, {
     token,
     refreshToken,
@@ -69,7 +73,10 @@ const signin = async (req, res) => {
 
   const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
   const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
-
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
   const userInfo = await User.findByIdAndUpdate(user._id, {
     token,
     refreshToken,
@@ -151,7 +158,7 @@ const updateUserInfo = async (req, res) => {
 
 const logout = async (req, res) => {
   const { _id } = req.user;
-  await User.findByIdAndUpdate(_id, { token: '' });
+  await User.findByIdAndUpdate(_id, { token: '', refreshToken: '' });
 
   res.json({
     message: 'Logout success',
