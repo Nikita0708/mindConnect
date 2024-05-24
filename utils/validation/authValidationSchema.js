@@ -48,7 +48,7 @@ export const userSigninSchema = Joi.object({
   password: Joi.string().min(6).required().messages({
     'string.base': `"password" must be a string.`,
     'string.empty': `"password" must not be empty.`,
-    'string.min': `"username" should have a maximum length of 6`,
+    'string.min': `"password" should have a maximum length of 6`,
     'any.required': `"password" is a required field.`,
   }),
 });

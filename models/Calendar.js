@@ -3,8 +3,11 @@ import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 
 const { Schema, model } = mongoose;
 
+const timeRegexp = /\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/;
+
 const itemSchema = new Schema({
   note: { type: String, required: true },
+  time: { type: String, match: timeRegexp, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -14,6 +17,7 @@ const CalendarSchema = new Schema({
     ref: 'user',
     required: true,
   },
+  // add matching regexp to date
   date: {
     type: Date,
   },
