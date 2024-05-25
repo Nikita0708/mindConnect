@@ -26,7 +26,7 @@ authRouter.post('/signup', userSignupValidate, authController.signup);
 
 authRouter.post('/signin', userSigninValidate, authController.signin);
 
-authRouter.post('/refreshtoken', authController.refreshtoken);
+authRouter.get('/refreshtoken', authController.refreshtoken);
 
 authRouter.patch(
   '/updatedetails',
