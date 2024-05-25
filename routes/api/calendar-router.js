@@ -15,28 +15,28 @@ calendarRouter.post(
   calendarController.addCalendar
 );
 calendarRouter.get(
-  '/calendars',
+  '/dates-calendar',
   authenticate,
   calendarController.getCalendarsByDates
 );
 calendarRouter.delete(
-  '/calendar/:date/notes/:noteId',
+  '/delete-note/:date/notes/:noteId',
   authenticate,
   calendarController.deleteNote
 );
 calendarRouter.get(
-  '/calendar/:date',
+  '/one-calendar/:date',
   authenticate,
   calendarController.getOneCalendar
 );
 calendarRouter.put(
-  '/calendar/:date/notes/:noteId',
+  '/update-note/:date/notes/:noteId',
   authenticate,
   calendarValidate,
   calendarController.updateNote
 );
 calendarRouter.post(
-  '/updatestatus/:date',
+  '/update-status/:date',
   authenticate,
   calendarController.setStatus
 );
