@@ -41,6 +41,28 @@ const addCalendar = async (req, res, next) => {
   }
 };
 
+const setStatus = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { status } = req.body;
+  const { date } = req.params;
+  const conditions = { owner, date };
+
+  if (
+    !['very bad', 'bad', '50/50', 'ok', 'good', 'very good'].includes(status)
+  ) {
+    throw HttpError(400, 'Invalid status');
+  }
+
+  const updatedCalendar = await Calendar.findOneAndUpdate(
+    conditions,
+    {
+      status,
+    },
+    { new: true, upsert: true }
+  );
+  res.status(200).json(updatedCalendar);
+};
+
 const getCalendarsByDates = async (req, res) => {
   const { _id: owner } = req.user;
   const { startDate, endDate } = req.query;
@@ -142,4 +164,5 @@ export default {
   deleteNote: ctrlWrapper(deleteNote),
   getOneCalendar: ctrlWrapper(getOneCalendar),
   updateNote: ctrlWrapper(updateNote),
+  setStatus: ctrlWrapper(setStatus),
 };
