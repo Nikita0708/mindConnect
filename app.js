@@ -9,6 +9,7 @@ import MongoStore from 'connect-mongo';
 import calendarRouter from './routes/api/calendar-router.js';
 
 import passportConfig from './utils/config/passport.js';
+import cookieParser from 'cookie-parser';
 passportConfig(passport);
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(passport.session());
 
 app.use(logger(formatsLogger));
 app.use(cors({ credentials: true }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 
