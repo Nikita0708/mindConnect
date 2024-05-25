@@ -38,9 +38,14 @@ const signup = async (req, res) => {
   };
 
   const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
-  const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, { expiresIn: '7d' });
+  const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
+    expiresIn: '7d',
+  });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   const userInfo = await User.findByIdAndUpdate(newUser._id, {
@@ -72,9 +77,14 @@ const signin = async (req, res) => {
   };
 
   const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
-  const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, { expiresIn: '7d' });
+  const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
+    expiresIn: '7d',
+  });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   const userInfo = await User.findByIdAndUpdate(user._id, {
@@ -176,7 +186,9 @@ const refreshToken = async (req, res) => {
       id: existingUser._id,
     };
     const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
-    const newRefreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, { expiresIn: '7d' });
+    const newRefreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
+      expiresIn: '7d',
+    });
 
     const userInfo = await User.findByIdAndUpdate(existingUser._id, {
       token,
@@ -185,6 +197,9 @@ const refreshToken = async (req, res) => {
 
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.json({
