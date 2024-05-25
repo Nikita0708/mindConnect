@@ -12,8 +12,6 @@ import passportConfig from './utils/config/passport.js';
 import cookieParser from 'cookie-parser';
 passportConfig(passport);
 
-const { CLIENT_URL } = process.env;
-
 const app = express();
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
@@ -30,7 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(logger(formatsLogger));
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
+app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
