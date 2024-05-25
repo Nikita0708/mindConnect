@@ -35,5 +35,10 @@ calendarRouter.put(
   calendarValidate,
   calendarController.updateNote
 );
+calendarRouter.post(
+  '/updatestatus/:date',
+  authenticate,
+  calendarController.setStatus
+);
 
 export default calendarRouter;
