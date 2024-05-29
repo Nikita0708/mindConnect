@@ -31,7 +31,7 @@ authRouter.get('/refreshtoken', authController.refreshtoken);
 authRouter.patch(
   '/updatedetails',
   authenticate,
-  upload.single('avatar'),
+  upload.single('image'),
   userInfoValidate,
   authController.updateUserInfo
 );

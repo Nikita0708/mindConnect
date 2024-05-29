@@ -29,6 +29,6 @@ PostSchema.pre('findOneAndUpdate', runValidatorsAtUpdate);
 
 PostSchema.post('findOneAndUpdate', handleSaveError);
 
-const Post = model('calendar', PostSchema);
+const Post = model('posts', PostSchema);
 
 export default Post;

@@ -133,8 +133,8 @@ const updateUserInfo = async (req, res) => {
 
     try {
       const existingUser = await User.findById(_id);
-      if (existingUser.avatarUrl) {
-        const publicId = existingUser.avatarUrl.split('/').pop().split('.')[0];
+      if (existingUser.image) {
+        const publicId = existingUser.image.split('/').pop().split('.')[0];
         await cloudinary.uploader.destroy(`avatarsMindConnect/${publicId}`);
       }
       const result = await cloudinary.uploader.upload(temporaryName, {
@@ -154,10 +154,10 @@ const updateUserInfo = async (req, res) => {
   }
 
   const updatedUserData = {
-    firstName,
-    lastName,
-    number,
-    description,
+    firstName: firstName || req.user.firstName,
+    lastName: lastName || req.user.lastName,
+    number: number || req.user.number,
+    description: description || req.user.description,
     image: finalAvatarUrl,
   };
 
