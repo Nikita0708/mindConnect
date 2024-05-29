@@ -1,5 +1,6 @@
-import { ctrlWrapper } from '../decorators';
 import { HttpError } from '../helpers/index.js';
+
+import { ctrlWrapper } from '../decorators/index.js';
 import User from '../models/User.js';
 
 const isDoctor = async (req, res, next) => {

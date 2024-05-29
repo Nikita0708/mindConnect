@@ -7,6 +7,7 @@ import authRouter from './routes/api/auth-router.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import calendarRouter from './routes/api/calendar-router.js';
+import postsRouter from './routes/api/post-router.js';
 
 import passportConfig from './utils/config/passport.js';
 import cookieParser from 'cookie-parser';
@@ -35,6 +36,7 @@ app.use(express.static('public'));
 
 app.use('/api/auth', authRouter);
 app.use('/api/calendar', calendarRouter);
+app.use('/api/post', postsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
