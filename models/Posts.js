@@ -2,6 +2,12 @@ import mongoose from 'mongoose';
 import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 const { Schema, model } = mongoose;
 
+const CommentSchema = new Schema({
+  content: String,
+  postId: { type: Schema.Types.ObjectId, ref: 'Post' },
+  createdAt: { type: Date, default: Date.now },
+});
+
 const PostSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
@@ -20,6 +26,7 @@ const PostSchema = new Schema({
     type: Number,
     default: 0,
   },
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   createdAt: { type: Date, default: Date.now },
 });
 

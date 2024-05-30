@@ -24,5 +24,17 @@ postsRouter.patch(
   upload.single('image'),
   postsController.updatePost
 );
+postsRouter.post(
+  '/:postId/add-comment',
+  authenticate,
+  postsController.addComment
+);
+postsRouter.get('/:postId/comments', authenticate, postsController.getComments);
+
+postsRouter.delete(
+  '/delete-comment/:commentId',
+  authenticate,
+  postsController.deleteComment
+);
 
 export default postsRouter;

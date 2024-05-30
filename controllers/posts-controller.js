@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import Post from '../models/Posts.js';
+import Comment from '../models/Comment.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -75,8 +76,48 @@ const updatePost = async (req, res) => {
   res.status(200).json({ message: 'Post updated successfully' });
 };
 
+const addComment = async (req, res) => {
+  const { postId } = req.params;
+  const { content } = req.body;
+  const { _id: owner } = req.user;
+
+  const post = await Post.findById({ _id: postId });
+  if (!post) {
+    throw HttpError(404, 'Post not found');
+  }
+  const comment = new Comment({ owner, content, postId });
+  await comment.save();
+
+  post.comments.push(comment);
+  await post.save();
+  res.status(200).json({ message: 'Successfully created comment', comment });
+};
+
+const getComments = async (req, res) => {
+  const { postId } = req.params;
+  const post = await Post.findById(postId).populate('comments');
+  if (!post) {
+    throw HttpError(404, 'Post not found');
+  }
+  res.status(200).json(post.comments);
+};
+const deleteComment = async (req, res) => {
+  const { commentId } = req.params;
+  const { _id: owner } = req.user;
+
+  const comment = await Comment.findByIdAndDelete({ owner, _id: commentId });
+  if (!comment) {
+    throw HttpError(404, 'Comment not found');
+  }
+  comment.remove();
+  res.status(200).json({ message: 'Comment deleted successfully' });
+};
+
 export default {
   addPost: ctrlWrapper(addPost),
   deletePost: ctrlWrapper(deletePost),
   updatePost: ctrlWrapper(updatePost),
+  addComment: ctrlWrapper(addComment),
+  getComments: ctrlWrapper(getComments),
+  deleteComment: ctrlWrapper(deleteComment),
 };
