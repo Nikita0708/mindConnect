@@ -1,6 +1,11 @@
 import express from 'express';
 import postsController from '../../controllers/posts-controller.js';
-import { isDoctor, authenticate, upload } from '../../middlewares/index.js';
+import {
+  isDoctor,
+  authenticate,
+  upload,
+  checkCommentOwnership,
+} from '../../middlewares/index.js';
 
 const postsRouter = express.Router();
 
@@ -34,7 +39,10 @@ postsRouter.get('/:postId/comments', authenticate, postsController.getComments);
 postsRouter.delete(
   '/delete-comment/:commentId',
   authenticate,
+  checkCommentOwnership,
   postsController.deleteComment
 );
+postsRouter.patch('/:postId/like', authenticate, postsController.likePost);
+postsRouter.patch('/:postId/unlike', authenticate, postsController.unlikePost);
 
 export default postsRouter;

@@ -3,6 +3,7 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import Post from '../models/Posts.js';
 import Comment from '../models/Comment.js';
+import mongoose from 'mongoose';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -110,7 +111,46 @@ const deleteComment = async (req, res) => {
     throw HttpError(404, 'Comment not found');
   }
   comment.remove();
+
   res.status(200).json({ message: 'Comment deleted successfully' });
+};
+
+const likePost = async (req, res) => {
+  const { _id } = req.user;
+  const { postId } = req.params;
+
+  const post = await Post.findById({ _id: postId });
+  if (!post) {
+    throw HttpError(404, 'Post not found');
+  }
+  if (post.likes.includes(_id)) {
+    throw HttpError(400, 'You already liked this post');
+  }
+  post.likes.push(_id);
+  await post.save();
+
+  res.status(200).json('you successfully liked this post');
+};
+
+const unlikePost = async (req, res) => {
+  const { _id } = req.user;
+  const { postId } = req.params;
+
+  const post = await Post.findById({ _id: postId });
+
+  if (!post) {
+    throw HttpError(404, 'Post not found');
+  }
+  // Convert _id to ObjectId
+  const userObjectId = mongoose.Types.ObjectId(_id);
+
+  if (!post.likes.some((like) => like.equals(userObjectId))) {
+    throw HttpError(400, 'You have not liked this post');
+  }
+  post.likes = post.likes.filter((like) => !like.equals(userObjectId));
+  await post.save();
+
+  res.status(200).json('You unliked this post');
 };
 
 export default {
@@ -120,4 +160,6 @@ export default {
   addComment: ctrlWrapper(addComment),
   getComments: ctrlWrapper(getComments),
   deleteComment: ctrlWrapper(deleteComment),
+  likePost: ctrlWrapper(likePost),
+  unlikePost: ctrlWrapper(unlikePost),
 };
