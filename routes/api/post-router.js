@@ -5,6 +5,7 @@ import {
   authenticate,
   upload,
   checkCommentOwnership,
+  checkPostOwnership,
 } from '../../middlewares/index.js';
 
 const postsRouter = express.Router();
@@ -19,6 +20,7 @@ postsRouter.post(
 postsRouter.delete(
   '/delete-post/:postId',
   authenticate,
+  checkPostOwnership,
   isDoctor,
   postsController.deletePost
 );
