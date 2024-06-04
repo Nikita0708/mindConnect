@@ -6,3 +6,4 @@ export { default as calendar } from './calendar.js';
 export { default as isDoctor } from './isDoctor.js';
 export { default as checkCommentOwnership } from './isPostOrCommentCreator.js';
 export { default as checkPostOwnership } from './isPostOwner.js';
+export { default as doctorPatient } from './doctor-patient.js';

@@ -45,7 +45,16 @@ const UserSchema = new Schema({
     match: true,
   },
   description: String,
-  userDoctor: Number,
+  patientDoctor: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+  },
+  doctorPatients: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+    },
+  ],
   token: String,
   refreshToken: String,
   resetPasswordtoken: String,
