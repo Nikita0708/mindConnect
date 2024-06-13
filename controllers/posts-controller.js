@@ -4,6 +4,7 @@ import { ctrlWrapper } from '../decorators/index.js';
 import Post from '../models/Posts.js';
 import Comment from '../models/Comment.js';
 import mongoose from 'mongoose';
+import User from '../models/User.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -153,6 +154,27 @@ const unlikePost = async (req, res) => {
   res.status(200).json('You unliked this post');
 };
 
+const lastPosts = async (req, res) => {
+  const posts = await Post.find().sort({ createdAt: -1 });
+  if (!posts) {
+    throw HttpError(404, 'posts not found');
+  }
+  res.status(200).json(posts);
+};
+
+const getPostsFromOneDoctor = async (req, res) => {
+  const { doctorId } = req.params;
+  const user = await User.findById({ _id: doctorId });
+  if (user.isDoctor === false) {
+    throw HttpError(403, 'User is not a doctor');
+  }
+  const posts = await Post.find({ owner: doctorId });
+  if (!posts) {
+    throw HttpError(404, 'No publications yet');
+  }
+  res.status(200).json(posts);
+};
+
 export default {
   addPost: ctrlWrapper(addPost),
   deletePost: ctrlWrapper(deletePost),
@@ -162,4 +184,6 @@ export default {
   deleteComment: ctrlWrapper(deleteComment),
   likePost: ctrlWrapper(likePost),
   unlikePost: ctrlWrapper(unlikePost),
+  getPostsFromOneDoctor: ctrlWrapper(getPostsFromOneDoctor),
+  lastPosts: ctrlWrapper(lastPosts),
 };

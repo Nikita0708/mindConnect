@@ -55,11 +55,17 @@ const UserSchema = new Schema({
       ref: 'user',
     },
   ],
+  subscribers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  subscribedTo: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   token: String,
   refreshToken: String,
   resetPasswordtoken: String,
   resetPasswordRequestedAt: { type: Date },
   image: String,
+});
+
+const doctorSchema = new Schema({
+  specialization: String,
 });
 
 UserSchema.post('save', handleSaveError);
