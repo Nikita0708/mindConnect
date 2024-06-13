@@ -47,4 +47,11 @@ postsRouter.delete(
 postsRouter.patch('/:postId/like', authenticate, postsController.likePost);
 postsRouter.patch('/:postId/unlike', authenticate, postsController.unlikePost);
 
+postsRouter.get(
+  '/posts/:doctorId',
+  authenticate,
+  postsController.getPostsFromOneDoctor
+);
+postsRouter.get('/last-posts', authenticate, postsController.lastPosts);
+
 export default postsRouter;

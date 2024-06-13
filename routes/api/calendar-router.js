@@ -14,6 +14,7 @@ calendarRouter.post(
   calendarValidate,
   calendarController.addCalendar
 );
+// Add owner middleware
 calendarRouter.get(
   '/dates-calendar',
   authenticate,

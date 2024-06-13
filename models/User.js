@@ -45,12 +45,27 @@ const UserSchema = new Schema({
     match: true,
   },
   description: String,
-  userDoctor: Number,
+  patientDoctor: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+  },
+  doctorPatients: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+    },
+  ],
+  subscribers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  subscribedTo: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   token: String,
   refreshToken: String,
   resetPasswordtoken: String,
   resetPasswordRequestedAt: { type: Date },
   image: String,
+});
+
+const doctorSchema = new Schema({
+  specialization: String,
 });
 
 UserSchema.post('save', handleSaveError);

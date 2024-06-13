@@ -3,11 +3,14 @@ import logger from 'morgan';
 import cors from 'cors';
 import 'dotenv/config';
 import passport from 'passport';
-import authRouter from './routes/api/auth-router.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+
+import authRouter from './routes/api/auth-router.js';
 import calendarRouter from './routes/api/calendar-router.js';
 import postsRouter from './routes/api/post-router.js';
+import doctorPatientRouter from './routes/api/doctor-patient-router.js';
+import userRouter from './routes/api/user-router.js';
 
 import passportConfig from './utils/config/passport.js';
 import cookieParser from 'cookie-parser';
@@ -37,6 +40,8 @@ app.use(express.static('public'));
 app.use('/api/auth', authRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/post', postsRouter);
+app.use('/api/doctor-patient', doctorPatientRouter);
+app.use('/api/user', userRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
