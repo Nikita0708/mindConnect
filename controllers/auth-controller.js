@@ -102,6 +102,7 @@ const signin = async (req, res) => {
 
 const getCurrent = async (req, res) => {
   const {
+    _id,
     email,
     firstName,
     lastName,
@@ -111,6 +112,7 @@ const getCurrent = async (req, res) => {
     description,
   } = req.user;
   res.json({
+    id: _id,
     email,
     firstName,
     lastName,
