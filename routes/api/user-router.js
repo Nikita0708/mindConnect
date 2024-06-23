@@ -18,10 +18,4 @@ userRouter.patch(
 
 userRouter.get('/doctors', authenticate, userController.getDoctors);
 
-userRouter.get(
-  '/users-by-emails',
-  authenticate,
-  userController.findUsersByEmails
-);
-
 export default userRouter;

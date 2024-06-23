@@ -60,20 +60,8 @@ const getDoctors = async (req, res) => {
   res.status(200).json(doctors);
 };
 
-const findUsersByEmails = async (req, res) => {
-  const { emails } = req.body;
-
-  if (!Array.isArray(emails)) {
-    throw HttpError(400, 'Invalid input. Array expected');
-  }
-  const users = await User.find({ email: { $in: emails } }).select('_id');
-
-  res.status(200).json({ users });
-};
-
 export default {
   subscribeOnDoctor: ctrlWrapper(subscribeOnDoctor),
   unsubscribeOnDoctor: ctrlWrapper(unsubscribeOnDoctor),
   getDoctors: ctrlWrapper(getDoctors),
-  findUsersByEmails: ctrlWrapper(findUsersByEmails),
 };
