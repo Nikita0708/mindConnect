@@ -27,11 +27,13 @@ authRouter.post('/signup', userSignupValidate, authController.signup);
 authRouter.post('/signin', userSigninValidate, authController.signin);
 
 authRouter.get('/refreshtoken', authController.refreshtoken);
-authRouter.get(
+
+authRouter.post(
   '/users-by-emails',
   authenticate,
   authController.findUsersByEmails
 );
+
 authRouter.patch(
   '/updatedetails',
   authenticate,
