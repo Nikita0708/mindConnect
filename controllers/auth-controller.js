@@ -316,8 +316,9 @@ const findUsersByEmails = async (req, res) => {
     throw HttpError(400, 'Invalid input. Array expected');
   }
   const users = await User.find({ email: { $in: emails } }).select('_id');
+  const userIds = users.map((user) => user._id);
 
-  res.status(200).json({ users });
+  res.status(200).json({ userIds });
 };
 
 export default {
