@@ -110,6 +110,7 @@ const getCurrent = async (req, res) => {
     image,
     certificate,
     description,
+    isDoctor,
   } = req.user;
   res.json({
     id: _id,
@@ -120,6 +121,7 @@ const getCurrent = async (req, res) => {
     image,
     certificate,
     description,
+    isDoctor,
   });
 };
 
