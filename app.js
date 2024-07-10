@@ -14,6 +14,7 @@ import userRouter from './routes/api/user-router.js';
 
 import passportConfig from './utils/config/passport.js';
 import cookieParser from 'cookie-parser';
+import researchRouter from './routes/api/researches-router.js';
 passportConfig(passport);
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/calendar', calendarRouter);
 app.use('/api/post', postsRouter);
 app.use('/api/doctor-patient', doctorPatientRouter);
 app.use('/api/user', userRouter);
+app.use('/api/researches', researchRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
