@@ -192,6 +192,16 @@ const getDcotorProfileById = async (req, res) => {
   });
 };
 
+const getPostById = async (req, res) => {
+  const { postId } = req.params;
+
+  const post = await Post.findById({ _id: postId });
+  if (!post) {
+    throw HttpError(404, 'Post not found');
+  }
+  res.status(200).json(post);
+};
+
 export default {
   addPost: ctrlWrapper(addPost),
   deletePost: ctrlWrapper(deletePost),
@@ -204,4 +214,5 @@ export default {
   getPostsFromOneDoctor: ctrlWrapper(getPostsFromOneDoctor),
   lastPosts: ctrlWrapper(lastPosts),
   getDcotorProfileById: ctrlWrapper(getDcotorProfileById),
+  getPostById: ctrlWrapper(getPostById),
 };
