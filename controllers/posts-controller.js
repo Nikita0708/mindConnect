@@ -175,6 +175,23 @@ const getPostsFromOneDoctor = async (req, res) => {
   res.status(200).json(posts);
 };
 
+const getDcotorProfileById = async (req, res) => {
+  const { doctorId } = req.params;
+  const user = await User.findById({ _id: doctorId });
+  if (user.isDoctor === false) {
+    throw HttpError(403, 'User is not a doctor');
+  }
+  res.status(200).json({
+    username: user.firstName,
+    email: user.email,
+    description: user.description,
+    image: user.image,
+    lastName: user.lastName,
+    subscribers: user.subscribers,
+    subscribedTo: user.subscribedTo,
+  });
+};
+
 export default {
   addPost: ctrlWrapper(addPost),
   deletePost: ctrlWrapper(deletePost),
@@ -186,4 +203,5 @@ export default {
   unlikePost: ctrlWrapper(unlikePost),
   getPostsFromOneDoctor: ctrlWrapper(getPostsFromOneDoctor),
   lastPosts: ctrlWrapper(lastPosts),
+  getDcotorProfileById: ctrlWrapper(getDcotorProfileById),
 };

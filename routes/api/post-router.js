@@ -54,4 +54,10 @@ postsRouter.get(
 );
 postsRouter.get('/last-posts', authenticate, postsController.lastPosts);
 
+postsRouter.get(
+  '/profile/:doctorId',
+  authenticate,
+  postsController.getDcotorProfileById
+);
+
 export default postsRouter;
