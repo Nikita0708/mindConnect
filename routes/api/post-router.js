@@ -59,5 +59,6 @@ postsRouter.get(
   authenticate,
   postsController.getDcotorProfileById
 );
+postsRouter.get('/:postId', authenticate, postsController.getPostById);
 
 export default postsRouter;
