@@ -127,6 +127,7 @@ const likePost = async (req, res) => {
   if (post.likes.includes(_id)) {
     throw HttpError(400, 'You already liked this post');
   }
+  s;
   post.likes.push(_id);
   await post.save();
 

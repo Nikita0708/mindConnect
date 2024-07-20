@@ -6,7 +6,4 @@ export const calendarSchema = Joi.object({
   note: Joi.string().required().messages({
     'any.required': `missing required note field`,
   }),
-  time: Joi.string().pattern(timeRegexp).required().messages({
-    'any.requried': 'missing required time field',
-  }),
 });
