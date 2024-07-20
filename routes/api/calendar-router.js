@@ -33,7 +33,6 @@ calendarRouter.get(
 calendarRouter.put(
   '/update-note/:date/notes/:noteId',
   authenticate,
-  calendarValidate,
   calendarController.updateNote
 );
 calendarRouter.post(
