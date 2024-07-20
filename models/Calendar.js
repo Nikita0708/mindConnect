@@ -7,7 +7,7 @@ const timeRegexp = /\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/;
 
 const itemSchema = new Schema({
   note: { type: String, required: true },
-  time: { type: String, match: timeRegexp, required: true },
+  time: { type: String, match: timeRegexp },
   createdAt: { type: Date, default: Date.now },
 });
 
