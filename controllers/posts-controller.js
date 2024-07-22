@@ -183,7 +183,7 @@ const getDcotorProfileById = async (req, res) => {
     throw HttpError(403, 'User is not a doctor');
   }
   res.status(200).json({
-    username: user.firstName,
+    firstName: user.firstName,
     email: user.email,
     description: user.description,
     image: user.image,
