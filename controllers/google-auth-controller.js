@@ -86,7 +86,13 @@ const receiveGoogleUserData = async (req, res, next) => {
     };
     const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
     const refreshToken = jwt.sign(payload, API_KEY_JWT, { expiresIn: '7d' });
-
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'None',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
     const userInfo = await User.findByIdAndUpdate(newUser._id, {
       token,
       refreshToken,
