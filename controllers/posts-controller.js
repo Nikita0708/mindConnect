@@ -103,6 +103,7 @@ const getComments = async (req, res) => {
   }
   res.status(200).json(post.comments);
 };
+
 const deleteComment = async (req, res) => {
   const { commentId } = req.params;
   const { _id: owner } = req.user;
