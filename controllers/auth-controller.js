@@ -180,7 +180,7 @@ const logout = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  const { refreshToken } = req.cookeis;
+  const { refreshToken } = req.cookies;
   const userData = jwt.verify(refreshToken, process.env.API_KEY_JWT_REFRESH);
 
   const existingUser = await User.findById(userData.id);
