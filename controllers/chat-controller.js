@@ -1,6 +1,8 @@
-import { ctrlWrapper } from '../decorators';
-import { HttpError } from '../helpers';
-import Chat from '../models/Chat';
+import { ctrlWrapper } from '../decorators/index.js';
+
+import { HttpError } from '../helpers/index.js';
+
+import Chat from '../models/Chat.js';
 
 const getChatsById = async (req, res) => {
   const { userId } = req.params;
