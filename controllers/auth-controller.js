@@ -41,13 +41,6 @@ const signup = async (req, res) => {
   const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
     expiresIn: '7d',
   });
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
   const userInfo = await User.findByIdAndUpdate(newUser._id, {
     token,
     refreshToken,
@@ -79,13 +72,6 @@ const signin = async (req, res) => {
   const token = jwt.sign(payload, API_KEY_JWT, { expiresIn: '6h' });
   const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
     expiresIn: '7d',
-  });
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   const userInfo = await User.findByIdAndUpdate(user._id, {
     token,
@@ -180,7 +166,7 @@ const logout = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  const { refreshToken } = req.cookies;
+  const { refreshToken } = req.body;
   const userData = jwt.verify(refreshToken, process.env.API_KEY_JWT_REFRESH);
 
   const existingUser = await User.findById(userData.id);
@@ -197,14 +183,6 @@ const refreshToken = async (req, res) => {
     const userInfo = await User.findByIdAndUpdate(existingUser._id, {
       token,
       refreshToken: newRefreshToken,
-    });
-
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     res.json({
       token: userInfo.token,
