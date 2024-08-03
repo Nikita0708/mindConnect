@@ -26,7 +26,7 @@ authRouter.post('/signup', userSignupValidate, authController.signup);
 
 authRouter.post('/signin', userSigninValidate, authController.signin);
 
-authRouter.get('/refreshtoken', authController.refreshtoken);
+authRouter.post('/refreshtoken', authController.refreshtoken);
 
 authRouter.post(
   '/users-by-emails',
