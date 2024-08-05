@@ -1,6 +1,13 @@
 import User from '../models/User.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 const subscribeOnDoctor = async (req, res) => {
   const { _id } = req.user;
@@ -60,7 +67,7 @@ const getDoctors = async (req, res) => {
   res.status(200).json(doctors);
 };
 
-const updateDoctorProfile = async (req, res) => {
+const updateDoctorProfile = async (req, res, next) => {
   const {
     description,
     priceOneHour,

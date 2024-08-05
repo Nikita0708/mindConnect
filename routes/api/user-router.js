@@ -1,6 +1,6 @@
 import express from 'express';
 import userController from '../../controllers/user-controller.js';
-import { authenticate, isDoctor } from '../../middlewares/index.js';
+import { authenticate, isDoctor, upload } from '../../middlewares/index.js';
 
 const userRouter = express.Router();
 
@@ -22,6 +22,7 @@ userRouter.patch(
   '/update-doctor-profile',
   authenticate,
   isDoctor,
+  upload.single('image'),
   userController.updateDoctorProfile
 );
 
