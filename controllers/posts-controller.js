@@ -49,33 +49,49 @@ const deletePost = async (req, res) => {
 const updatePost = async (req, res) => {
   const { _id: owner } = req.user;
   const { postId } = req.params;
-  const { title, description, image } = req.body;
+  const { title, description } = req.body;
 
-  let imageUrl;
+  let updateFields = {};
+
+  // Only add fields to updateFields if they are provided and not null or empty string
+  if (title !== undefined && title !== null && title !== '')
+    updateFields.title = title;
+  if (description !== undefined && description !== null && description !== '')
+    updateFields.description = description;
+
   if (req.file) {
     const { path: temporaryName } = req.file;
     const result = await cloudinary.uploader.upload(temporaryName, {
       folder: 'post-images',
     });
-    imageUrl = result.secure_url;
+    updateFields.image = result.secure_url;
   }
+
   const conditions = { owner, _id: postId };
 
-  const updatedPost = await Post.findOneAndUpdate(
-    conditions,
-    {
-      title,
-      description,
-      image: imageUrl,
-    },
-    { new: true } // Return the updated document
-  );
+  // Only perform update if there are fields to update
+  if (Object.keys(updateFields).length > 0) {
+    const updatedPost = await Post.findOneAndUpdate(
+      conditions,
+      { $set: updateFields },
+      { new: true } // Return the updated document
+    );
 
-  if (!updatedPost) {
-    throw HttpError(404, 'Post not found');
+    if (!updatedPost) {
+      throw HttpError(404, 'Post not found');
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Post updated successfully', post: updatedPost });
+  } else {
+    // If no fields to update, just fetch and return the current post
+    const post = await Post.findOne(conditions);
+    if (!post) {
+      throw HttpError(404, 'Post not found');
+    }
+    res.status(200).json({ message: 'No changes made', post });
   }
-
-  res.status(200).json({ message: 'Post updated successfully' });
 };
 
 const addComment = async (req, res) => {
