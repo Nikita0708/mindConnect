@@ -22,7 +22,7 @@ const UserSchema = new Schema({
     type: String,
     minlength: 6,
   },
-  number: {
+  phoneNumber: {
     type: String,
     match: numberRegexp,
   },
@@ -36,6 +36,7 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  gender: String,
   isDoctor: {
     type: Boolean,
     default: false,
@@ -44,7 +45,53 @@ const UserSchema = new Schema({
     type: Boolean,
     match: true,
   },
-  description: String,
+  description: {
+    type: String,
+    min: 10,
+    max: 200,
+  },
+  priceOneHour: {
+    price: Number,
+    currency: String,
+  },
+  typeOfConsultation: {
+    type: [String],
+    enum: ['online', 'offline'],
+  },
+  fieldsOfProblems: {
+    type: [String],
+    enum: [
+      'Post-Traumatic Stress Disorder (PTSD)',
+      'Generalized Anxiety Disorder (GAD)',
+      'Stress',
+      'Burnout',
+      'ADHD',
+      'Panic Disorder',
+      'Depression',
+      'Social Anxiety Disorder',
+      'Specific Phobias',
+      'Major Depressive Disorder',
+      'Bipolar Disorder',
+      'Schizoaffective Disorder',
+      'Alcohol Use Disorder',
+      'Gambling Disorder',
+      'Substance Use Disorders',
+      'Gender Dysphoria',
+      'Dependent Personality Disorder',
+    ],
+  },
+  aboutMe: String,
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+  languages: {
+    type: [String],
+  },
+  country: String,
+  city: String,
+  yearsOfExperience: {
+    type: Number,
+    min: 1,
+    max: 70,
+  },
   patientDoctor: {
     type: Schema.Types.ObjectId,
     ref: 'user',
@@ -57,15 +104,8 @@ const UserSchema = new Schema({
   ],
   subscribers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   subscribedTo: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  token: String,
-  refreshToken: String,
-  resetPasswordtoken: String,
   resetPasswordRequestedAt: { type: Date },
   image: String,
-});
-
-const doctorSchema = new Schema({
-  specialization: String,
 });
 
 UserSchema.post('save', handleSaveError);

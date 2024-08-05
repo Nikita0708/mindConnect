@@ -1,6 +1,6 @@
 import express from 'express';
 import userController from '../../controllers/user-controller.js';
-import { authenticate } from '../../middlewares/index.js';
+import { authenticate, isDoctor } from '../../middlewares/index.js';
 
 const userRouter = express.Router();
 
@@ -17,5 +17,18 @@ userRouter.patch(
 );
 
 userRouter.get('/doctors', authenticate, userController.getDoctors);
+
+userRouter.patch(
+  '/update-doctor-profile',
+  authenticate,
+  isDoctor,
+  userController.updateDoctorProfile
+);
+
+userRouter.get(
+  '/doctor-details/:doctorId',
+  authenticate,
+  userController.getDoctorDetails
+);
 
 export default userRouter;
