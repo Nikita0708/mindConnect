@@ -41,10 +41,10 @@ const signup = async (req, res) => {
   const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
     expiresIn: '7d',
   });
-  const userInfo = await User.findByIdAndUpdate(newUser._id, {
+  const userInfo = {
     token,
     refreshToken,
-  });
+  };
 
   res.status(201).json({
     token: userInfo.token,
@@ -73,10 +73,10 @@ const signin = async (req, res) => {
   const refreshToken = jwt.sign(payload, API_KEY_JWT_REFRESH, {
     expiresIn: '7d',
   });
-  const userInfo = await User.findByIdAndUpdate(user._id, {
+  const userInfo = {
     token,
     refreshToken,
-  });
+  };
 
   res.json({
     token: userInfo.token,
@@ -148,7 +148,7 @@ const updateUserInfo = async (req, res) => {
     lastName: lastName || req.user.lastName,
     number: number || req.user.number,
     description: description || req.user.description,
-    image: finalAvatarUrl,
+    image: finalAvatarUrl || req.user.iamge,
   };
 
   await User.findByIdAndUpdate(_id, updatedUserData);
@@ -255,7 +255,6 @@ const verifyToken = async (req, res) => {
 
   const user = await User.findOne({
     _id: decoded.id,
-    resetPasswordtoken: token,
   });
 
   if (!user) {
@@ -272,7 +271,6 @@ const resetPassword = async (req, res) => {
     const decoded = jwt.verify(token, process.env.API_KEY_JWT);
     const user = await User.findOne({
       _id: decoded.id,
-      resetPasswordtoken: token,
     });
 
     if (!user) {
@@ -281,7 +279,6 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await User.findByIdAndUpdate(user._id, {
       password: hashedPassword,
-      resetPasswordtoken: '',
     });
     res.status(200).json('Password has been reset.');
   } catch (err) {
