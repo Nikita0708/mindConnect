@@ -140,6 +140,7 @@ const getDoctorDetails = async (req, res) => {
   const doctor = await User.findOne({ _id: doctorId });
 
   const doctorData = {
+    id: doctor._id,
     firstName: doctor.firstName,
     lastName: doctor.lastName,
     phoneNumber: doctor.phoneNumber,
