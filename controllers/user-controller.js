@@ -136,6 +136,34 @@ const updateDoctorProfile = async (req, res, next) => {
 };
 
 const getDoctorDetails = async (req, res) => {
+  const doctor = req.user;
+
+  const doctorData = {
+    id: doctor._id,
+    firstName: doctor.firstName,
+    lastName: doctor.lastName,
+    phoneNumber: doctor.phoneNumber,
+    description: doctor.description,
+    image: doctor.image,
+    priceOneHour: {
+      price: doctor.priceOneHour?.price,
+      currency: doctor.priceOneHour?.currency,
+    },
+    typeOfConsultation: doctor.typeOfConsultation,
+    fieldsOfProblems: doctor.fieldsOfProblems,
+    aboutMe: doctor.aboutMe,
+    languages: doctor.languages,
+    country: doctor.country,
+    city: doctor.city,
+    yearsOfExperience: doctor.yearsOfExperience,
+    age: doctor.age,
+    gender: doctor.gender,
+  };
+
+  res.status(200).json(doctorData);
+};
+
+const getPublicDoctorDetails = async (req, res) => {
   const { doctorId } = req.params;
   const doctor = await User.findOne({ _id: doctorId });
 
@@ -170,4 +198,5 @@ export default {
   getDoctors: ctrlWrapper(getDoctors),
   updateDoctorProfile: ctrlWrapper(updateDoctorProfile),
   getDoctorDetails: ctrlWrapper(getDoctorDetails),
+  getPublicDoctorDetails: ctrlWrapper(getPublicDoctorDetails),
 };

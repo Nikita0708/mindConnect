@@ -27,9 +27,16 @@ userRouter.patch(
 );
 
 userRouter.get(
-  '/doctor-details/:doctorId',
+  '/doctor-details/',
   authenticate,
+  isDoctor,
   userController.getDoctorDetails
+);
+
+userRouter.get(
+  '/public-doctor-details/:doctorId',
+  authenticate,
+  userController.getPublicDoctorDetails
 );
 
 export default userRouter;
