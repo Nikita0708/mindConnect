@@ -185,6 +185,19 @@ const getPrevCalendar = async (req, res) => {
   const { _id: owner } = req.user;
   const { calendarId } = req.params;
 
+  if (!calendarId || calendarId === 'null') {
+    // If calendarId is null, undefined, or the string "null", find and return the latest calendar
+    const latestCalendar = await Calendar.findOne({ owner }).sort({
+      index: -1,
+    });
+
+    if (!latestCalendar) {
+      throw HttpError(404, 'No calendars found');
+    }
+
+    return res.status(200).json(latestCalendar);
+  }
+
   const currentCalendar = await Calendar.findOne({ owner, _id: calendarId });
 
   if (!currentCalendar) {
