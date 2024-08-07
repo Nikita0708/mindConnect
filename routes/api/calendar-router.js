@@ -36,4 +36,22 @@ calendarRouter.post(
   calendarController.setStatus
 );
 
+calendarRouter.delete(
+  '/delete/:calendarId',
+  authenticate,
+  calendarController.deleteCalendarById
+);
+
+calendarRouter.get(
+  '/previous-calendar/:calendarId',
+  authenticate,
+  calendarController.getPrevCalendar
+);
+
+calendarRouter.get(
+  '/next-calendar/:calendarId',
+  authenticate,
+  calendarController.getNextCalendar
+);
+
 export default calendarRouter;
