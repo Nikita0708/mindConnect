@@ -26,6 +26,9 @@ const CalendarSchema = new Schema({
     type: String,
     enum: ['very bad', 'bad', '50/50', 'ok', 'good', 'very good'],
   },
+  index: {
+    type: Number,
+  },
 });
 
 CalendarSchema.post('save', handleSaveError);

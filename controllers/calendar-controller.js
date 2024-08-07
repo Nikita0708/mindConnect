@@ -14,9 +14,18 @@ const addCalendar = async (req, res, next) => {
     throw HttpError(400, 'Time is required');
   }
 
-  const conditions = { owner, date };
-
   try {
+    const calendars = await Calendar.find({ owner });
+
+    let highestIndex = 0;
+    for (const calendar of calendars) {
+      if (calendar.index > highestIndex) {
+        highestIndex = calendar.index;
+      }
+    }
+
+    const conditions = { owner, date };
+
     const updatedCalendar = await Calendar.findOneAndUpdate(
       conditions,
       {
@@ -26,7 +35,8 @@ const addCalendar = async (req, res, next) => {
             time,
           },
         },
-        date: date,
+        date,
+        $setOnInsert: { index: highestIndex + 1 },
       },
       { new: true, upsert: true }
     );
@@ -158,6 +168,74 @@ const updateNote = async (req, res, next) => {
   }
 };
 
+const deleteCalendarById = async (req, res) => {
+  const { calendarId } = req.params;
+  const { _id: owner } = req.user;
+
+  const calendar = await Calendar.findOne({ owner, _id: calendarId });
+
+  if (!calendar || calendar.owner === owner) {
+    throw HttpError(404, 'Calendar not found');
+  }
+  await Calendar.deleteOne({ _id: calendarId });
+  res.status(200).json({ message: 'calendar deleted successfully' });
+};
+
+const getPrevCalendar = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { calendarId } = req.params;
+
+  const currentCalendar = await Calendar.findOne({ owner, _id: calendarId });
+
+  if (!currentCalendar) {
+    throw HttpError(404, 'Calendar not found');
+  }
+
+  const currentCalendarIndex = currentCalendar.index;
+
+  const prevCalendars = await Calendar.find({
+    owner,
+    index: { $lt: currentCalendarIndex },
+  })
+    .sort({ index: -1 })
+    .limit(1);
+
+  if (prevCalendars.length === 0) {
+    throw HttpError(404, 'No previous calendar found');
+  }
+
+  const prevCalendar = prevCalendars[0];
+
+  res.status(200).json(prevCalendar);
+};
+
+const getNextCalendar = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { calendarId } = req.params;
+
+  const currentCalendar = await Calendar.findOne({ owner, _id: calendarId });
+  if (!currentCalendar) {
+    throw HttpError(404, 'Current calendar not found');
+  }
+
+  const currentCalendarIndex = currentCalendar.index;
+
+  const nextCalendars = await Calendar.find({
+    owner,
+    index: { $gt: currentCalendarIndex },
+  })
+    .sort({ index: 1 })
+    .limit(1);
+
+  if (nextCalendars.length === 0) {
+    throw HttpError(404, 'No next calendar found');
+  }
+
+  const nextCalendar = nextCalendars[0];
+
+  res.status(200).json(nextCalendar);
+};
+
 export default {
   addCalendar: ctrlWrapper(addCalendar),
   getCalendarsByDates: ctrlWrapper(getCalendarsByDates),
@@ -165,4 +243,7 @@ export default {
   getOneCalendar: ctrlWrapper(getOneCalendar),
   updateNote: ctrlWrapper(updateNote),
   setStatus: ctrlWrapper(setStatus),
+  deleteCalendarById: ctrlWrapper(deleteCalendarById),
+  getPrevCalendar: ctrlWrapper(getPrevCalendar),
+  getNextCalendar: ctrlWrapper(getNextCalendar),
 };
