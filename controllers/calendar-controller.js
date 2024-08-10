@@ -249,6 +249,29 @@ const getNextCalendar = async (req, res) => {
   res.status(200).json(nextCalendar);
 };
 
+const allCalendarDates = async (req, res) => {
+  const { _id: owner } = req.user;
+
+  const calendars = await Calendar.find({ owner });
+
+  // Extract all date values from the calendars, filter out nulls, and format dates
+  const dateArray = calendars
+    .map((calendar) => calendar.date)
+    .filter((date) => date !== null)
+    .map((date) => {
+      const d = new Date(date);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        '0'
+      )}-${String(d.getDate()).padStart(2, '0')}`;
+    });
+
+  // Remove any duplicate dates and sort them
+  const uniqueDates = [...new Set(dateArray)].sort();
+
+  res.status(200).json(uniqueDates);
+};
+
 export default {
   addCalendar: ctrlWrapper(addCalendar),
   getCalendarsByDates: ctrlWrapper(getCalendarsByDates),
@@ -259,4 +282,5 @@ export default {
   deleteCalendarById: ctrlWrapper(deleteCalendarById),
   getPrevCalendar: ctrlWrapper(getPrevCalendar),
   getNextCalendar: ctrlWrapper(getNextCalendar),
+  allCalendarDates: ctrlWrapper(allCalendarDates),
 };
