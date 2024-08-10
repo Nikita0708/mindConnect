@@ -54,4 +54,10 @@ calendarRouter.get(
   calendarController.getNextCalendar
 );
 
+calendarRouter.get(
+  '/all-dates',
+  authenticate,
+  calendarController.allCalendarDates
+);
+
 export default calendarRouter;
