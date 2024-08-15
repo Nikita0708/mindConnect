@@ -39,4 +39,24 @@ userRouter.get(
   userController.getPublicDoctorDetails
 );
 
+userRouter.get(
+  '/calendar/:doctorId',
+  authenticate,
+  userController.getAvailableDates
+);
+
+userRouter.post(
+  '/calendar',
+  authenticate,
+  isDoctor,
+  userController.addAvailableDates
+);
+
+userRouter.delete(
+  '/calendar/:calendarId',
+  authenticate,
+  isDoctor,
+  userController.deleteAvailableSlot
+);
+
 export default userRouter;
