@@ -254,7 +254,6 @@ const allCalendarDates = async (req, res) => {
 
   const calendars = await Calendar.find({ owner });
 
-  // Extract all date values from the calendars, filter out nulls, and format dates
   const dateArray = calendars
     .map((calendar) => calendar.date)
     .filter((date) => date !== null)
@@ -265,8 +264,6 @@ const allCalendarDates = async (req, res) => {
         '0'
       )}-${String(d.getDate()).padStart(2, '0')}`;
     });
-
-  // Remove any duplicate dates and sort them
   const uniqueDates = [...new Set(dateArray)].sort();
 
   res.status(200).json(uniqueDates);

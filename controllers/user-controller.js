@@ -2,6 +2,8 @@ import User from '../models/User.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
+import { startOfWeek, endOfWeek, eachDayOfInterval, format } from 'date-fns';
+import DoctorCalendar from '../models/DoctorCalendar.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -192,6 +194,90 @@ const getPublicDoctorDetails = async (req, res) => {
   res.status(200).json(doctorData);
 };
 
+const getAvailableDates = async (req, res) => {
+  const { doctorId } = req.params;
+
+  const currentDate = new Date();
+  const start = format(startOfWeek(currentDate), 'yyyy-MM-dd');
+  const end = format(endOfWeek(currentDate), 'yyyy-MM-dd');
+
+  const availableSlots = await DoctorCalendar.find({
+    owner: doctorId,
+    date: {
+      $gte: start,
+      $lte: end,
+    },
+  }).lean();
+
+  if (!availableSlots.length) {
+    return res.status(404).json({ message: 'No available slots found.' });
+  }
+
+  const weekDays = eachDayOfInterval({
+    start: new Date(start),
+    end: new Date(end),
+  }).map((day) => ({
+    date: format(day, 'yyyy-MM-dd'),
+    dayOfWeek: format(day, 'EEEE'),
+    timeSlots: [],
+  }));
+
+  availableSlots.forEach((slot) => {
+    const dayIndex = weekDays.findIndex((day) => day.date === slot.date);
+    if (dayIndex !== -1) {
+      weekDays[dayIndex].timeSlots.push({
+        id: slot._id?.toString(),
+        time: slot.time,
+      });
+    }
+  });
+
+  res.status(200).json(weekDays);
+};
+
+const addAvailableDates = async (req, res) => {
+  const { date, time } = req.body;
+  const { _id: owner } = req.user;
+
+  const calendar = await DoctorCalendar.findOne({ owner, date, time });
+
+  if (calendar) {
+    throw HttpError(403, 'This time have been added already');
+  }
+
+  if (!date || !time) {
+    return res
+      .status(400)
+      .json({ message: 'Date and time are required fields' });
+  }
+
+  // Ensure date is stored in the same format as in the get request
+  const formattedDate = format(new Date(date), 'yyyy-MM-dd');
+
+  const newSlot = await DoctorCalendar.create({
+    owner,
+    date: formattedDate,
+    time,
+  });
+
+  res.status(200).json(newSlot);
+};
+
+const deleteAvailableSlot = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { calendarId } = req.params;
+
+  const calendar = await DoctorCalendar.find(owner, { _id: calendarId });
+
+  if (!calendar) {
+    throw HttpError(404, 'Slot not found');
+  }
+
+  const result = await DoctorCalendar.deleteOne({ _id: calendarId });
+
+  res.status(200).json({ message: 'successfully deleted entry' });
+};
+
 export default {
   subscribeOnDoctor: ctrlWrapper(subscribeOnDoctor),
   unsubscribeOnDoctor: ctrlWrapper(unsubscribeOnDoctor),
@@ -199,4 +285,7 @@ export default {
   updateDoctorProfile: ctrlWrapper(updateDoctorProfile),
   getDoctorDetails: ctrlWrapper(getDoctorDetails),
   getPublicDoctorDetails: ctrlWrapper(getPublicDoctorDetails),
+  getAvailableDates: ctrlWrapper(getAvailableDates),
+  deleteAvailableSlot: ctrlWrapper(deleteAvailableSlot),
+  addAvailableDates: ctrlWrapper(addAvailableDates),
 };
