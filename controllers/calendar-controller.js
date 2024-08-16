@@ -186,7 +186,6 @@ const getPrevCalendar = async (req, res) => {
   const { calendarId } = req.params;
 
   if (!calendarId || calendarId === 'null') {
-    // If calendarId is null, undefined, or the string "null", find and return the latest calendar
     const latestCalendar = await Calendar.findOne({ owner }).sort({
       index: -1,
     });

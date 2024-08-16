@@ -207,74 +207,66 @@ const getAvailableDates = async (req, res) => {
       $gte: start,
       $lte: end,
     },
-  }).lean();
+  });
 
   if (!availableSlots.length) {
     return res.status(404).json({ message: 'No available slots found.' });
   }
 
-  const weekDays = eachDayOfInterval({
-    start: new Date(start),
-    end: new Date(end),
-  }).map((day) => ({
-    date: format(day, 'yyyy-MM-dd'),
-    dayOfWeek: format(day, 'EEEE'),
-    timeSlots: [],
-  }));
-
-  availableSlots.forEach((slot) => {
-    const dayIndex = weekDays.findIndex((day) => day.date === slot.date);
-    if (dayIndex !== -1) {
-      weekDays[dayIndex].timeSlots.push({
-        id: slot._id?.toString(),
-        time: slot.time,
-      });
-    }
-  });
-
-  res.status(200).json(weekDays);
+  res.status(200).json(availableSlots);
 };
 
 const addAvailableDates = async (req, res) => {
   const { date, time } = req.body;
   const { _id: owner } = req.user;
 
-  const calendar = await DoctorCalendar.findOne({ owner, date, time });
-
-  if (calendar) {
-    throw HttpError(403, 'This time have been added already');
-  }
-
   if (!date || !time) {
     return res
       .status(400)
       .json({ message: 'Date and time are required fields' });
   }
-
-  // Ensure date is stored in the same format as in the get request
   const formattedDate = format(new Date(date), 'yyyy-MM-dd');
 
-  const newSlot = await DoctorCalendar.create({
-    owner,
-    date: formattedDate,
-    time,
-  });
+  const conditions = { owner, date };
+
+  const newSlot = await DoctorCalendar.findOneAndUpdate(
+    conditions,
+    {
+      $push: {
+        timeSlots: {
+          time,
+        },
+      },
+      date: formattedDate,
+    },
+    { new: true, upsert: true }
+  );
+
+  if (!newSlot) {
+    throw HttpError(404, 'Calendar entry not found');
+  }
 
   res.status(200).json(newSlot);
 };
 
 const deleteAvailableSlot = async (req, res) => {
   const { _id: owner } = req.user;
-  const { calendarId } = req.params;
+  const { calendarId, timeSlotId } = req.params;
 
-  const calendar = await DoctorCalendar.find(owner, { _id: calendarId });
+  const calendar = await DoctorCalendar.findOne({ _id: calendarId });
+  console.log(calendar);
 
   if (!calendar) {
     throw HttpError(404, 'Slot not found');
   }
 
-  const result = await DoctorCalendar.deleteOne({ _id: calendarId });
+  const sloteItem = calendar.timeSlots.id(timeSlotId);
 
+  if (!sloteItem) {
+    throw HttpError(404, 'No time slot was found');
+  }
+  sloteItem.remove();
+  await calendar.save();
   res.status(200).json({ message: 'successfully deleted entry' });
 };
 

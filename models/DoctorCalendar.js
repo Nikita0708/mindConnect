@@ -3,6 +3,10 @@ import { handleSaveError, runValidatorsAtUpdate } from './hooks.js';
 
 const { Schema, model } = mongoose;
 
+const timeSlotShema = new Schema({
+  time: String,
+});
+
 const DoctorCalendarSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
@@ -10,7 +14,7 @@ const DoctorCalendarSchema = new Schema({
     required: true,
   },
   date: String,
-  time: String,
+  timeSlots: [timeSlotShema],
 });
 
 DoctorCalendarSchema.post('save', handleSaveError);
