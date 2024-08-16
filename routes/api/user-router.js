@@ -53,7 +53,7 @@ userRouter.post(
 );
 
 userRouter.delete(
-  '/calendar/:calendarId',
+  '/calendar/:calendarId/:timeSlotId',
   authenticate,
   isDoctor,
   userController.deleteAvailableSlot
