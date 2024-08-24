@@ -19,6 +19,16 @@
     "prettier"
   ],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "import/extensions": ["error", "ignorePackages", {
+      "js": "never"
+    }],
+    "no-underscore-dangle": ["error", { "allow": ["_id", "_token"] }],
+    "no-useless-escape": "off",
+    "no-console": "warn",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
+    "consistent-return": "off",
+    "camelcase": "off",
+    "no-restricted-globals": ["error", "isNaN"]
   }
 }

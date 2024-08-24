@@ -201,27 +201,31 @@ const getAvailableDates = async (req, res) => {
   const start = format(startOfWeek(currentDate), 'yyyy-MM-dd');
   const end = format(endOfWeek(currentDate), 'yyyy-MM-dd');
 
-  const daysOfWeek = eachDayOfInterval({ start: new Date(start), end: new Date(end) })
-    .map(date => format(date, 'yyyy-MM-dd'));
-    const availableSlots = await DoctorCalendar.find({
-      owner: doctorId,
-      date: {
-        $gte: start,
-        $lte: end,
-      },
-    });
+  const daysOfWeek = eachDayOfInterval({
+    start: new Date(start),
+    end: new Date(end),
+  }).map((date) => format(date, 'yyyy-MM-dd'));
 
-    const slotsMap = availableSlots.reduce((acc, slot) => {
-      acc[slot.date] = slot.timeSlots;
-      return acc;
-    }, {});
+  const availableSlots = await DoctorCalendar.find({
+    owner: doctorId,
+    date: {
+      $gte: start,
+      $lte: end,
+    },
+  });
 
-    const response = daysOfWeek.map(day => ({
-      date: day,
-      timeSlots: slotsMap[day] || [], 
-    }));
+  const slotsMap = availableSlots.reduce((acc, slot) => {
+    acc[slot.date] = { _id: slot._id, timeSlots: slot.timeSlots };
+    return acc;
+  }, {});
 
-    res.status(200).json(response);
+  const response = daysOfWeek.map((day) => ({
+    date: day,
+    _id: slotsMap[day]?._id || null, // Use null if no entry exists
+    timeSlots: slotsMap[day]?.timeSlots || [], // If no slots exist, return an empty array
+  }));
+
+  res.status(200).json(response);
 };
 
 const addAvailableDates = async (req, res) => {
