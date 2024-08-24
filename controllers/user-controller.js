@@ -201,19 +201,27 @@ const getAvailableDates = async (req, res) => {
   const start = format(startOfWeek(currentDate), 'yyyy-MM-dd');
   const end = format(endOfWeek(currentDate), 'yyyy-MM-dd');
 
-  const availableSlots = await DoctorCalendar.find({
-    owner: doctorId,
-    date: {
-      $gte: start,
-      $lte: end,
-    },
-  });
+  const daysOfWeek = eachDayOfInterval({ start: new Date(start), end: new Date(end) })
+    .map(date => format(date, 'yyyy-MM-dd'));
+    const availableSlots = await DoctorCalendar.find({
+      owner: doctorId,
+      date: {
+        $gte: start,
+        $lte: end,
+      },
+    });
 
-  if (!availableSlots.length) {
-    return res.status(404).json({ message: 'No available slots found.' });
-  }
+    const slotsMap = availableSlots.reduce((acc, slot) => {
+      acc[slot.date] = slot.timeSlots;
+      return acc;
+    }, {});
 
-  res.status(200).json(availableSlots);
+    const response = daysOfWeek.map(day => ({
+      date: day,
+      timeSlots: slotsMap[day] || [], 
+    }));
+
+    res.status(200).json(response);
 };
 
 const addAvailableDates = async (req, res) => {
