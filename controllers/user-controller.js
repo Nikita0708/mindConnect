@@ -2,7 +2,13 @@ import User from '../models/User.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
-import { startOfWeek, endOfWeek, eachDayOfInterval, format } from 'date-fns';
+import {
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  eachDayOfInterval,
+  format,
+} from 'date-fns';
 import DoctorCalendar from '../models/DoctorCalendar.js';
 
 cloudinary.config({
@@ -196,15 +202,26 @@ const getPublicDoctorDetails = async (req, res) => {
 
 const getAvailableDates = async (req, res) => {
   const { doctorId } = req.params;
+  let weekOffset = parseInt(req.query.weekOffset) || 0; // Prevent negative weekOffset
+
+  if (weekOffset < 0) {
+    weekOffset = 0; // Set to 0 or you can return an error if preferred
+  } // Calculate the start and end of the desired week
 
   const currentDate = new Date();
-  const start = format(startOfWeek(currentDate), 'yyyy-MM-dd');
-  const end = format(endOfWeek(currentDate), 'yyyy-MM-dd');
+  const start = format(
+    startOfWeek(addWeeks(currentDate, weekOffset)),
+    'yyyy-MM-dd'
+  );
+  const end = format(
+    endOfWeek(addWeeks(currentDate, weekOffset)),
+    'yyyy-MM-dd'
+  ); // Get all days of the week
 
   const daysOfWeek = eachDayOfInterval({
     start: new Date(start),
     end: new Date(end),
-  }).map((date) => format(date, 'yyyy-MM-dd'));
+  }).map((date) => format(date, 'yyyy-MM-dd')); // Find available slots for the given week
 
   const availableSlots = await DoctorCalendar.find({
     owner: doctorId,
@@ -212,18 +229,18 @@ const getAvailableDates = async (req, res) => {
       $gte: start,
       $lte: end,
     },
-  });
+  }); // Create a map of slots keyed by date
 
   const slotsMap = availableSlots.reduce((acc, slot) => {
     acc[slot.date] = { _id: slot._id, timeSlots: slot.timeSlots };
     return acc;
-  }, {});
+  }, {}); // Create the response
 
   const response = daysOfWeek.map((day) => ({
     date: day,
     _id: slotsMap[day]?._id || null, // Use null if no entry exists
     timeSlots: slotsMap[day]?.timeSlots || [], // If no slots exist, return an empty array
-  }));
+  })); // Return the response
 
   res.status(200).json(response);
 };
