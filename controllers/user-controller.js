@@ -10,6 +10,7 @@ import {
   format,
 } from 'date-fns';
 import DoctorCalendar from '../models/DoctorCalendar.js';
+import nodemailer from 'nodemailer';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -299,6 +300,55 @@ const deleteAvailableSlot = async (req, res) => {
   res.status(200).json({ message: 'successfully deleted entry' });
 };
 
+const sendConsultationEmail = async (req, res) => {
+  const { date, time, text } = req.body;
+  const { doctorId, calendarId, timeSlotId } = req.params;
+
+  // Ensure asynchronous calls are awaited
+  const doctor = await User.findOne({ _id: doctorId });
+  if (!doctor) {
+    HttpError(404, 'Doctor not found');
+  }
+  const calendar = await DoctorCalendar.findOne({ _id: calendarId });
+  if (!calendar) {
+    HttpError(404, 'Slot not found');
+  }
+
+  const slotItem = calendar.timeSlots.id(timeSlotId);
+  if (!slotItem) {
+    HttpError(404, 'No time slot was found');
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: 'Hotmail',
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    to: doctor.email,
+    from: process.env.EMAIL,
+    subject: 'Invitation received Mind Connect',
+    text: `You received an appointment registration at ${time} on ${date}.\n\n
+    Here is the message from the patient: ${text} `,
+  };
+
+  transporter.sendMail(mailOptions, (err) => {
+    if (err) {
+      console.error('Error sending email:', err); // Improved logging
+      return res.status(500).json({ message: 'Error sending email.' });
+    }
+
+    // Remove slotItem if email was sent successfully
+    slotItem.remove();
+    calendar.save(); // Save the calendar after removing the time slot
+
+    res.status(200).json({ message: 'Invitation sent' });
+  });
+};
+
 export default {
   subscribeOnDoctor: ctrlWrapper(subscribeOnDoctor),
   unsubscribeOnDoctor: ctrlWrapper(unsubscribeOnDoctor),
@@ -309,4 +359,5 @@ export default {
   getAvailableDates: ctrlWrapper(getAvailableDates),
   deleteAvailableSlot: ctrlWrapper(deleteAvailableSlot),
   addAvailableDates: ctrlWrapper(addAvailableDates),
+  sendConsultationEmail: ctrlWrapper(sendConsultationEmail),
 };

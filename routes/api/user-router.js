@@ -59,4 +59,10 @@ userRouter.delete(
   userController.deleteAvailableSlot
 );
 
+userRouter.post(
+  '/appointment/:doctorId/:calendarId/:timeSlotId',
+  authenticate,
+  userController.sendConsultationEmail
+);
+
 export default userRouter;
