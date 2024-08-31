@@ -110,6 +110,10 @@ const getCurrent = async (req, res) => {
     image,
     certificate,
     description,
+    phoneNumber,
+    age,
+    city,
+    country,
     isDoctor,
   });
 };
