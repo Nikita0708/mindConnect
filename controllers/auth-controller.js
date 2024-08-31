@@ -106,7 +106,7 @@ const getCurrent = async (req, res) => {
     email,
     firstName,
     lastName,
-    number,
+    phoneNumber,
     image,
     certificate,
     description,
