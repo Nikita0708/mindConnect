@@ -112,7 +112,16 @@ const getCurrent = async (req, res) => {
 };
 
 const updateUserInfo = async (req, res) => {
-  const { firstName, lastName, number, image, description } = req.body;
+  const {
+    firstName,
+    lastName,
+    number,
+    image,
+    description,
+    country,
+    city,
+    age,
+  } = req.body;
 
   const { _id, isDoctor } = req.user;
 
@@ -148,6 +157,9 @@ const updateUserInfo = async (req, res) => {
     lastName: lastName || req.user.lastName,
     number: number || req.user.number,
     description: description || req.user.description,
+    age: age || req.user.age,
+    city: city || req.user.city,
+    country: country || req.user.country,
     image: finalAvatarUrl || req.user.iamge,
   };
 
