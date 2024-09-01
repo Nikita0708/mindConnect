@@ -5,6 +5,7 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
 import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const { API_KEY_JWT, API_KEY_JWT_REFRESH } = process.env;
 
@@ -56,6 +57,21 @@ const signup = async (req, res) => {
     token,
     refreshToken,
   });
+
+  try {
+    const r = await axios.put(
+      'https://api.chatengine.io/users/',
+      {
+        username: username,
+        secret: username,
+        first_name: firstName,
+      },
+      { headers: { 'private-key': process.env.CHAT_ENGINE_PRIVATE_KEY } }
+    );
+    return res.status(r.status).json(r.data);
+  } catch (error) {
+    return res.status(error.response.status).json(error.response.data);
+  }
 
   res.status(201).json({
     token: userInfo.token,
