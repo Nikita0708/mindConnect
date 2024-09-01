@@ -5,7 +5,6 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import { v2 as cloudinary } from 'cloudinary';
 import nodemailer from 'nodemailer';
-import axios from 'axios';
 
 const { API_KEY_JWT, API_KEY_JWT_REFRESH } = process.env;
 
@@ -39,19 +38,8 @@ const signup = async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const chatEngineUser = await axios.put(
-    'https://api.chatengine.io/users/',
-    {
-      username: username,
-      secret: username,
-      first_name: firstName,
-    },
-    { headers: { 'private-key': process.env.CHAT_ENGINE_PRIVATE_KEY } }
-  );
-
   const newUser = await User.create({
     ...req.body,
-    secret: chatEngineUser.data.secret,
     password: hashedPassword,
     createdAt: new Date(),
   });
