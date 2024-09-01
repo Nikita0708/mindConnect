@@ -111,6 +111,7 @@ const getCurrent = async (req, res) => {
     certificate,
     description,
     isDoctor,
+    username,
   } = req.user;
   res.json({
     id: _id,
@@ -126,6 +127,7 @@ const getCurrent = async (req, res) => {
     city,
     country,
     isDoctor,
+    username,
   });
 };
 
