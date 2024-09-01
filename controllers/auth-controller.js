@@ -39,8 +39,19 @@ const signup = async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  const chatEngineUser = await axios.put(
+    'https://api.chatengine.io/users/',
+    {
+      username: username,
+      secret: username,
+      first_name: firstName,
+    },
+    { headers: { 'private-key': process.env.CHAT_ENGINE_PRIVATE_KEY } }
+  );
+
   const newUser = await User.create({
     ...req.body,
+    secret: chatEngineUser.data.secret,
     password: hashedPassword,
     createdAt: new Date(),
   });
@@ -57,21 +68,6 @@ const signup = async (req, res) => {
     token,
     refreshToken,
   });
-
-  try {
-    const r = await axios.put(
-      'https://api.chatengine.io/users/',
-      {
-        username: username,
-        secret: username,
-        first_name: firstName,
-      },
-      { headers: { 'private-key': process.env.CHAT_ENGINE_PRIVATE_KEY } }
-    );
-    return res.status(r.status).json(r.data);
-  } catch (error) {
-    return res.status(error.response.status).json(error.response.data);
-  }
 
   res.status(201).json({
     token: userInfo.token,
@@ -128,6 +124,7 @@ const getCurrent = async (req, res) => {
     description,
     isDoctor,
     username,
+    secret,
   } = req.user;
   res.json({
     id: _id,
@@ -144,6 +141,7 @@ const getCurrent = async (req, res) => {
     country,
     isDoctor,
     username,
+    secret,
   });
 };
 
