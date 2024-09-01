@@ -15,8 +15,19 @@ cloudinary.config({
 });
 
 const signup = async (req, res) => {
-  const { firstName, email, password, isDoctor, certificate } = req.body;
+  const {
+    firstName,
+    email,
+    password,
+    isDoctor,
+    certificate,
+    username,
+  } = req.body;
   const user = await User.findOne({ email });
+  const userNameExists = await User.findOne({ username });
+  if (userNameExists) {
+    throw HttpError(409, `username ${userNameExists} already in use`);
+  }
   if (user) {
     throw HttpError(409, `email ${email} already in use`);
   }
@@ -49,7 +60,7 @@ const signup = async (req, res) => {
   res.status(201).json({
     token: userInfo.token,
     refreshToken: userInfo.refreshToken,
-    user: { email: userInfo.email, userName: firstName },
+    user: { email: userInfo.email, username: username, userName: firstName },
     message: 'You have successfully signed up',
   });
 };
@@ -100,6 +111,7 @@ const getCurrent = async (req, res) => {
     certificate,
     description,
     isDoctor,
+    username,
   } = req.user;
   res.json({
     id: _id,
@@ -115,6 +127,7 @@ const getCurrent = async (req, res) => {
     city,
     country,
     isDoctor,
+    username,
   });
 };
 
