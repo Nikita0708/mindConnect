@@ -58,6 +58,7 @@ const UserSchema = new Schema({
     price: Number,
     currency: String,
   },
+  secret: String,
   typeOfConsultation: {
     type: [String],
     enum: ['online', 'offline'],
