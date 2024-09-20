@@ -9,6 +9,13 @@ calendarRouter.post(
   calendar,
   calendarController.addCalendar
 );
+
+calendarRouter.post(
+  '/add-today-calendar/:date',
+  authenticate,
+  calendar,
+  calendarController.createTodaysCalendar
+);
 // Add owner middleware
 calendarRouter.get(
   '/dates-calendar',
