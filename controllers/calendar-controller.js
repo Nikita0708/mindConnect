@@ -2,6 +2,36 @@ import Calendar from '../models/Calendar.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 
+const createTodaysCalendar = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { date } = req.params;
+
+  const calendars = await Calendar.find({ owner });
+
+  let highestIndex = 0;
+  for (const calendar of calendars) {
+    if (calendar.index > highestIndex) {
+      highestIndex = calendar.index;
+    }
+  }
+  const conditions = { owner, date };
+
+  const updatedCalendar = await Calendar.findOneAndUpdate(
+    conditions,
+    {
+      date,
+      $setOnInsert: { index: highestIndex + 1 },
+    },
+    { new: true, upsert: true }
+  );
+
+  if (!updatedCalendar) {
+    throw HttpError(404, 'Calendar entry not found');
+  }
+
+  res.status(200).json(updatedCalendar);
+};
+
 const addCalendar = async (req, res, next) => {
   const { _id: owner } = req.user;
   const { date } = req.params;
@@ -279,4 +309,5 @@ export default {
   getPrevCalendar: ctrlWrapper(getPrevCalendar),
   getNextCalendar: ctrlWrapper(getNextCalendar),
   allCalendarDates: ctrlWrapper(allCalendarDates),
+  createTodaysCalendar: ctrlWrapper(createTodaysCalendar),
 };

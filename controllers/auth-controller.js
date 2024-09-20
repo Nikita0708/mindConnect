@@ -112,7 +112,6 @@ const getCurrent = async (req, res) => {
     description,
     isDoctor,
     username,
-    secret,
   } = req.user;
   res.json({
     id: _id,
@@ -129,7 +128,6 @@ const getCurrent = async (req, res) => {
     country,
     isDoctor,
     username,
-    secret,
   });
 };
 
