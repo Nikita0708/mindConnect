@@ -15,14 +15,7 @@ cloudinary.config({
 });
 
 const signup = async (req, res) => {
-  const {
-    firstName,
-    email,
-    password,
-    isDoctor,
-    certificate,
-    username,
-  } = req.body;
+  const { firstName, email, password, username } = req.body;
   const user = await User.findOne({ email });
   const userNameExists = await User.findOne({ username });
   if (userNameExists) {
@@ -30,10 +23,6 @@ const signup = async (req, res) => {
   }
   if (user) {
     throw HttpError(409, `email ${email} already in use`);
-  }
-
-  if (isDoctor && !certificate) {
-    throw HttpError(403, 'if you are doctor, you must have a certificate');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
